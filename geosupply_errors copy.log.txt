@@ -13,12 +13,3 @@ fatal: Authentication failed for 'https://github.com/JeffStone69/geosupply_analy
 2026-04-01 14:45:12,066 - ERROR - Git pull failed: remote: Invalid username or token. Password authentication is not supported for Git operations.
 fatal: Authentication failed for 'https://github.com/JeffStone69/geosupply_analyzer.git/'
 
-2026-04-01 15:28:04,193 - ERROR - Git pull failed: error: cannot pull with rebase: You have unstaged changes.
-error: Please commit or stash them.
-
-2026-04-01 15:57:25,041 - ERROR - Git pull failed: error: cannot pull with rebase: You have unstaged changes.
-error: Please commit or stash them.
-
-2026-04-01 16:07:15,210 - ERROR - Git pull failed: error: cannot pull with rebase: You have unstaged changes.
-error: Please commit or stash them.
-
