@@ -22,3 +22,14 @@ error: Please commit or stash them.
 2026-04-01 16:07:15,210 - ERROR - Git pull failed: error: cannot pull with rebase: You have unstaged changes.
 error: Please commit or stash them.
 
+2026-04-02 08:48:06,565 - ERROR - Traceback (most recent call last):
+  File "/Users/jeff/Downloads/XAi/TSLAWEB/geosupply_analyzer/geosupply_analyzer/geosupply_analyzer.py", line 180, in self_update
+    subprocess.check_call(["git", "status"], timeout=10, capture_output=True)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 414, in check_call
+    retcode = call(*popenargs, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 395, in call
+    with Popen(*popenargs, **kwargs) as p:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'
+
