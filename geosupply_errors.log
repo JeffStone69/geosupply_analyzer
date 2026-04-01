@@ -1,0 +1,6 @@
+2026-04-01 12:20:14,242 - ERROR - Git pull failed: remote: Invalid username or token. Password authentication is not supported for Git operations.
+fatal: Authentication failed for 'https://github.com/JeffStone69/A.git/'
+
+2026-04-01 13:09:14,243 - ERROR - Git pull failed: remote: Invalid username or token. Password authentication is not supported for Git operations.
+fatal: Authentication failed for 'https://github.com/JeffStone69/geosupply_analyser.git/'
+

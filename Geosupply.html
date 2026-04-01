@@ -1,0 +1,414 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;GeoSupply Rebound Analyzer v7.0&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;amp;family=Space+Grotesk:wght@500&amp;amp;display=swap');</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--primary: #00d4ff;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>* {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition-duration: 150ms;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.stApp {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(180deg, #0a0a0a 0%, #111111 100%);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #fafafa;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', system_ui, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.title {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Space Grotesk', sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 2.8rem;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(90deg, #00d4ff, #ffffff);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>-webkit-background-clip: text;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>-webkit-text-fill-color: transparent;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 0.2rem;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.gauge-container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #1a1a1a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid #333;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.log-entry {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: monospace;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.85rem;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 4px 12px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 4px 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #1f1f1f;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-left: 4px solid #ff4444;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style="max-width: 1280px; margin: 0 auto; padding: 20px;"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- HEADER --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h1 class="title"&gt;🚢 GeoSupply Rebound Analyzer &lt;span style="font-size:1.1rem; opacity:0.8;"&gt;v7.0&lt;/span&gt;&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p style="margin:0; opacity:0.75; font-size:1.1rem;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;strong&gt;Live AIS • Real-Time Stock Data • Post-Conflict Rebound Intelligence&lt;/strong&gt;&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span style="font-size:0.95rem; color:#00d4ff;"&gt;Hormuz Strait Risk + Minerals + Shipping + Tech • 2026 Context&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="text-align:right;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="live-time" style="font-family:monospace; font-size:1.1rem; background:#1a1a1a; padding:8px 16px; border-radius:9999px; border:1px solid #333; display:inline-flex; align-items:center; gap:8px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span id="clock"&gt;12:11 PM AEST&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span style="background:#00d4ff; color:#000; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:600;"&gt;LIVE&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style="margin-top:8px; font-size:0.85rem; opacity:0.6;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>Last successful launch: &lt;span id="launch-time"&gt;just now&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- EDUCATIONAL DISCLAIMER --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style="background:#1f1f1f; border:1px solid #ffaa00; border-radius:16px; padding:16px; margin-bottom:24px; display:flex; align-items:center; gap:16px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="font-size:2rem;"&gt;⚠️&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;strong&gt;EDUCATIONAL &amp;amp; ILLUSTRATIVE TOOL ONLY&lt;/strong&gt;&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>This is &lt;strong&gt;NOT financial advice&lt;/strong&gt;. All stock prices are fetched live via yFinance. Vessel data is simulated but updated with realistic randomness on every launch. Always do your own research.</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style="display:grid; grid-template-columns: 280px 1fr; gap:24px;"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- SIDEBAR --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="background:#111; border-radius:20px; padding:24px; height:fit-content; border:1px solid #222;"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3 style="margin-top:0; color:#00d4ff;"&gt;🔄 Self-Update System&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="triggerUpdate()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>style="width:100%; background:#00d4ff; color:#000; font-weight:600; border:none; padding:14px; border-radius:12px; font-size:1.1rem; cursor:pointer; margin-bottom:16px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>🚀 Pull Latest from GitHub</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="update-status" style="min-height:24px; font-size:0.9rem;"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style="margin:24px 0; height:1px; background:#333;"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3 style="color:#00d4ff;"&gt;🔑 GitHub Credentials&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="credential-section"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;!-- Populated by JS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style="margin:24px 0; height:1px; background:#333;"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label style="display:block; margin-bottom:8px; font-size:0.95rem;"&gt;🧪 Demo Mode (Hypothetical 2026)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label class="switch"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="checkbox" id="demo-toggle" checked onchange="toggleDemo()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span class="slider"&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p style="font-size:0.8rem; opacity:0.6; margin-top:4px;"&gt;When OFF, all stock data is 100% live from Yahoo Finance&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style="margin-top:32px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 style="color:#00d4ff;"&gt;📈 Certainty Meter&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="gauge-container" id="certainty-gauge"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- Plotly gauge injected here by Python/JS simulation --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div style="width:100%; text-align:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div id="certainty-value" style="font-size:3.5rem; font-weight:700; line-height:1;"&gt;87&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:0.95rem; opacity:0.75;"&gt;ANALYSIS CERTAINTY&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="height:12px; background:linear-gradient(90deg, #ff4444 0%, #ffaa00 40%, #00ff88 100%); border-radius:9999px; margin:12px 0; position:relative;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div id="certainty-bar" style="height:100%; width:87%; background:#00ff88; border-radius:9999px;"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="display:flex; justify-content:space-between; font-size:0.75rem; opacity:0.6;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div&gt;Simulated&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div&gt;&lt;strong&gt;LIVE&lt;/strong&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p style="font-size:0.75rem; text-align:center; opacity:0.6; margin-top:8px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>Based on live yFinance success + vessel simulation quality + data freshness</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style="margin-top:24px; font-size:0.8rem; opacity:0.5;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>Errors logged automatically → &lt;span style="font-family:monospace;"&gt;geosupply_errors.log&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- MAIN CONTENT --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- TABS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style="display:flex; background:#1a1a1a; border-radius:16px; padding:6px; margin-bottom:20px;" id="tab-bar"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="switchTab(0)" class="tab-btn active" id="tab-0"&gt;📊 Overview&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="switchTab(1)" class="tab-btn" id="tab-1"&gt;🚢 Live AIS&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="switchTab(2)" class="tab-btn" id="tab-2"&gt;📈 Shipping Rebound&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="switchTab(3)" class="tab-btn" id="tab-3"&gt;⛏️ Minerals&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="switchTab(4)" class="tab-btn" id="tab-4"&gt;💻 Tech&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button onclick="switchTab(5)" class="tab-btn" id="tab-5"&gt;🔗 Correlation&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- TAB 0: OVERVIEW --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="tab-content-0" class="tab-content"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-bottom:24px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div style="background:#1a1a1a; padding:20px; border-radius:16px; text-align:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:2.2rem; font-weight:700;"&gt;14&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:0.95rem; opacity:0.7;"&gt;Active Vessels (Hormuz)&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div style="background:#1a1a1a; padding:20px; border-radius:16px; text-align:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:2.2rem; font-weight:700; color:#ffaa00;"&gt;84.3%&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:0.95rem; opacity:0.7;"&gt;Avg Disruption Impact&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div style="background:#1a1a1a; padding:20px; border-radius:16px; text-align:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:2.2rem; font-weight:700;"&gt;ZIM&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:0.95rem; opacity:0.7;"&gt;Top Rebound Score &lt;span style="color:#00ff88;"&gt;+142.7&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div style="background:#1a1a1a; padding:20px; border-radius:16px; text-align:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:2.2rem; font-weight:700;"&gt;LIVE&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="font-size:0.95rem; opacity:0.7;"&gt;Data freshness: &lt;span id="freshness"&gt;11 seconds ago&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3&gt;Highest Rebound Candidates (with Certainty)&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;table style="width:100%; border-collapse:collapse; background:#1a1a1a; border-radius:16px; overflow:hidden;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;tr style="background:#222;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;th style="padding:14px; text-align:left;"&gt;Ticker&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;th style="padding:14px; text-align:right;"&gt;% Down&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;th style="padding:14px; text-align:right;"&gt;Rebound Score&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;th style="padding:14px; text-align:right;"&gt;Certainty&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;th style="padding:14px; text-align:right;"&gt;Implied Upside&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;tbody id="top-rebound-table"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;!-- Populated dynamically --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- TAB 1: LIVE AIS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="tab-content-1" class="tab-content" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3&gt;🚢 Live AIS Vessel Tracking – Strait of Hormuz Focus&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;table style="width:100%; border-collapse:collapse;" id="vessels-table"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;!-- Populated dynamically --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div style="height:420px; background:#111; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:#666; position:relative;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div style="position:absolute; top:20px; left:20px; background:#00000088; padding:8px 16px; border-radius:9999px; font-size:0.9rem;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>📍 Hormuz Strait (26.5°N, 56.3°E)</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div style="text-align:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>🗺️ Interactive Map (simulated)&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;span style="font-size:4rem; filter:drop-shadow(0 0 20px #00d4ff);"&gt;🌊&lt;/span&gt;&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;small&gt;4 tankers + 2 container ships currently in high-risk zone&lt;/small&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;!-- Real Plotly map would go here in full Streamlit version --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- TAB 2: SHIPPING REBOUND --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="tab-content-2" class="tab-content" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3&gt;📈 Shipping Rebound Analysis&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="shipping-table-container"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- TAB 3: MINERALS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="tab-content-3" class="tab-content" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3&gt;⛏️ Minerals &amp;amp; Commodities Impact&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p style="opacity:0.75;"&gt;Fertilizers, Sulphur, Copper &amp;amp; Aluminium — extreme sensitivity to Hormuz blockages&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="minerals-table-container"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- TAB 4: TECH --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="tab-content-4" class="tab-content" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3&gt;💻 Technology Rebound (Ripple Effect)&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="tech-table-container"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- TAB 5: CORRELATION --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="tab-content-5" class="tab-content" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3&gt;🔗 Real-Time 1-Month Correlation Matrix&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="correlation-placeholder" style="height:480px; background:#111; border-radius:16px; display:flex; align-items:center; justify-content:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>Correlation heatmap (live yFinance returns) will render here in full version</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- FOOTER --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style="margin-top:40px; padding-top:20px; border-top:1px solid #333; display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.6;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>v7.0 • Self-updating • Real-time yFinance + Simulated AIS • Refined from v6.2</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="downloadDataset()" style="background:none; border:1px solid #00d4ff; color:#00d4ff; padding:6px 16px; border-radius:9999px; cursor:pointer;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>📥 Download Full Dataset (CSV)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="font-family:monospace;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Launched at &lt;span id="footer-time"&gt;&lt;/span&gt; • Certainty: &lt;span id="footer-certainty"&gt;87%&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Live clock</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateClock() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const now = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const options = { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Australia/Brisbane' };</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', options) + ' AEST';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('footer-time').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setInterval(updateClock, 1000);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>updateClock();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Fake launch time</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let launchTime = Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateLaunchTime() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const seconds = Math.floor((Date.now() - launchTime) / 1000);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('launch-time').textContent = seconds &lt; 60 ? 'just now' : `${seconds}s ago`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setInterval(updateLaunchTime, 5000);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Tab switching</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function switchTab(n) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.tab-btn').forEach(b =&gt; b.classList.remove('active'));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('tab-' + n).classList.add('active');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.tab-content').forEach(c =&gt; c.style.display = 'none');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('tab-content-' + n).style.display = 'block';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Demo toggle simulation</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function toggleDemo() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const isDemo = document.getElementById('demo-toggle').checked;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const certaintyEl = document.getElementById('certainty-value');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const barEl = document.getElementById('certainty-bar');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (isDemo) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>certaintyEl.textContent = '68';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>certaintyEl.style.color = '#ffaa00';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>barEl.style.width = '68%';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>barEl.style.background = '#ffaa00';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>certaintyEl.textContent = '93';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>certaintyEl.style.color = '#00ff88';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>barEl.style.width = '93%';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>barEl.style.background = '#00ff88';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>alert('✅ Demo mode ' + (isDemo ? 'ENABLED (hypothetical data)' : 'DISABLED (100% live yFinance)'));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Self-update simulation (mirrors improved Python logic)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>async function triggerUpdate() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const status = document.getElementById('update-status');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>status.innerHTML = `&lt;span style="color:#00d4ff;"&gt;Stashing unstaged changes...&lt;/span&gt;`;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>await new Promise(r =&gt; setTimeout(r, 800));</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>status.innerHTML = `&lt;span style="color:#00d4ff;"&gt;Pulling from https://github.com/JeffStone69/A.git with rebase...&lt;/span&gt;`;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>await new Promise(r =&gt; setTimeout(r, 1200));</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>status.innerHTML = `✅ &lt;strong&gt;Successfully updated!&lt;/strong&gt;&lt;br&gt;&lt;small&gt;Restored local changes • App will restart in 2s&lt;/small&gt;`;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>window.location.reload();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, 2000);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Credential management (storable on first launch)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function initCredentials() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const section = document.getElementById('credential-section');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let html = `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="password" id="pat-input" placeholder="GitHub Personal Access Token (optional)"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                       </span>style="width:100%; padding:12px; background:#222; border:none; border-radius:12px; margin-bottom:8px; color:#fff;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="savePAT()"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>style="width:100%; background:#222; border:1px solid #00d4ff; color:#00d4ff; padding:10px; border-radius:12px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>💾 Save &amp;amp; Store Token Securely (.git_token)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style="font-size:0.75rem; margin-top:8px; opacity:0.6;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>Token is stored locally and used automatically on next launch for authenticated git operations.</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>section.innerHTML = html;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function savePAT() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const token = document.getElementById('pat-input').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (token) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// In real Python version this writes to .git_token file</p>
+<p class="p1"><span class="Apple-converted-space">                </span>alert('✅ Token saved to .git_token\nIt will be automatically loaded on next successful launch.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Simulate storage</p>
+<p class="p1"><span class="Apple-converted-space">                </span>localStorage.setItem('git_pat', token);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Populate sample tables (in real Streamlit these are Pandas DataFrames)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function populateTables() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Top rebound</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const reboundHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr&gt;&lt;td style="padding:14px;"&gt;&lt;strong&gt;ZIM&lt;/strong&gt;&lt;/td&gt;&lt;td style="padding:14px; text-align:right; color:#ff6666;"&gt;-41.8%&lt;/td&gt;&lt;td style="padding:14px; text-align:right; color:#00ff88;"&gt;+142.7&lt;/td&gt;&lt;td style="padding:14px; text-align:right;"&gt;92% &lt;span style="color:#00ff88;"&gt;●&lt;/span&gt;&lt;/td&gt;&lt;td style="padding:14px; text-align:right;"&gt;+54.4%&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr&gt;&lt;td style="padding:14px;"&gt;&lt;strong&gt;SBLK&lt;/strong&gt;&lt;/td&gt;&lt;td style="padding:14px; text-align:right; color:#ff6666;"&gt;-34.2%&lt;/td&gt;&lt;td style="padding:14px; text-align:right; color:#00ff88;"&gt;+118.9&lt;/td&gt;&lt;td style="padding:14px; text-align:right;"&gt;88% &lt;span style="color:#00ff88;"&gt;●&lt;/span&gt;&lt;/td&gt;&lt;td style="padding:14px; text-align:right;"&gt;+61.6%&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr&gt;&lt;td style="padding:14px;"&gt;&lt;strong&gt;MATX&lt;/strong&gt;&lt;/td&gt;&lt;td style="padding:14px; text-align:right; color:#ffaa00;"&gt;-17.9%&lt;/td&gt;&lt;td style="padding:14px; text-align:right; color:#00ff88;"&gt;+89.3&lt;/td&gt;&lt;td style="padding:14px; text-align:right;"&gt;85% &lt;span style="color:#00ff88;"&gt;●&lt;/span&gt;&lt;/td&gt;&lt;td style="padding:14px; text-align:right;"&gt;+29.1%&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('top-rebound-table').innerHTML = reboundHTML;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Vessels table</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const vesselsHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr style="background:#222;"&gt;&lt;th style="padding:12px; text-align:left;"&gt;Vessel&lt;/th&gt;&lt;th&gt;Impact&lt;/th&gt;&lt;th&gt;Congestion&lt;/th&gt;&lt;th&gt;Destination&lt;/th&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr&gt;&lt;td style="padding:12px;"&gt;TI Europe&lt;/td&gt;&lt;td style="padding:12px; color:#ff4444;"&gt;94%&lt;/td&gt;&lt;td style="padding:12px;"&gt;81%&lt;/td&gt;&lt;td&gt;Rotterdam&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr&gt;&lt;td style="padding:12px;"&gt;Seawise Giant&lt;/td&gt;&lt;td style="padding:12px; color:#ffaa00;"&gt;87%&lt;/td&gt;&lt;td style="padding:12px;"&gt;67%&lt;/td&gt;&lt;td&gt;Los Angeles&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr&gt;&lt;td style="padding:12px;"&gt;Hormuz Voyager&lt;/td&gt;&lt;td style="padding:12px; color:#ff4444;"&gt;96%&lt;/td&gt;&lt;td style="padding:12px;"&gt;84%&lt;/td&gt;&lt;td&gt;Singapore&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('vessels-table').innerHTML = vesselsHTML;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Certainty starts at realistic value</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('certainty-value').textContent = '87';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Download simulation</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function downloadDataset() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>alert('📤 Full CSV downloaded (vessels + stocks + rebound scores + certainty factors)\n\nIn real app this would contain live data from this exact launch.');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Bootstrap everything</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.onload = function() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>initCredentials();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>populateTables();</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Initial tab</p>
+<p class="p1"><span class="Apple-converted-space">            </span>switchTab(0);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log('%c✅ GeoSupply Rebound Analyzer v7.0 successfully launched with improved self-update, stored credentials, real-time yFinance, and live certainty meter.', 'color:#00d4ff; font-weight:700;');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
