@@ -44,3 +44,4 @@ TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'
          ~~~~~^^^^^^^^^^^^^^^^^^^^^^
 TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'
 
+2026-04-02 09:24:13,554 - ERROR - Git pull failed: fatal: Cannot rebase onto multiple branches.
