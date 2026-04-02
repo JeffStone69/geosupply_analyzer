@@ -122,3 +122,17 @@ TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'
 2026-04-02 14:12:57,131 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
 2026-04-02 14:12:57,967 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
 2026-04-02 14:15:03,107 - ERROR - Grok API error after 4 attempts: HTTPSConnectionPool(host='api.x.ai', port=443): Read timed out. (read timeout=30)
+2026-04-02 15:58:00,956 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 15:58:02,448 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 15:59:11,307 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 15:59:12,046 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 15:59:23,527 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 15:59:24,272 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 16:00:07,585 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 16:00:08,619 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 16:02:20,307 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 16:02:21,064 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 16:03:21,671 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 16:03:22,510 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 16:03:38,905 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 16:03:39,669 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
