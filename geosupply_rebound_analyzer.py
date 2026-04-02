@@ -16,18 +16,18 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 
 # =============================================
-# ⚓ GeoSupply Rebound Analyzer v8.9 — ASX Resources & Logistics Edition
-# Production Ready • xAI Grok API Authentication • Grok-Powered Self-Update
+# ⚓ GeoSupply Rebound Analyzer v9.0 — ASX Resources & Logistics Edition
+# Fixed: Removed sklearn dependency • xAI Grok API • Production Ready
 # =============================================
 
 st.set_page_config(
-    page_title="GeoSupply Rebound Analyzer v8.9",
+    page_title="GeoSupply Rebound Analyzer v9.0",
     page_icon="⚓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-VERSION = "8.9"
+VERSION = "9.0"
 LAST_UPDATED = "April 2026"
 
 # ===================== LOGGING =====================
@@ -44,9 +44,9 @@ if "xai_api_key" not in st.session_state:
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = "grok-beta"
 
-# ===================== xAI GROK API CALL =====================
+# ===================== xAI GROK API =====================
 def call_grok_api(prompt: str, temperature: float = 0.7, max_tokens: int = 1500) -> str:
-    """Call xAI Grok API with proper authentication."""
+    """Call xAI Grok API with authentication."""
     api_key = st.session_state.xai_api_key
     if not api_key:
         return "❌ xAI API key not configured. Please add it in the sidebar."
@@ -86,6 +86,7 @@ def call_grok_api(prompt: str, temperature: float = 0.7, max_tokens: int = 1500)
 # ===================== DATA FETCH =====================
 @st.cache_data(ttl=300)
 def fetch_asx_data(tickers):
+    """Robust fetch without any sklearn dependency."""
     data = {}
     for ticker in tickers:
         try:
@@ -98,6 +99,7 @@ def fetch_asx_data(tickers):
             high_52w = float(df['Close'].max())
             rebound_score = round(((current - low_52w) / (high_52w - low_52w)) * 100, 1) if high_52w > low_52w else 50.0
 
+            # Safer RSI calculation
             delta = df['Close'].diff()
             gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
             loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
@@ -178,13 +180,13 @@ Current app: GeoSupply Rebound Analyzer v{VERSION} (ASX focused).
 Git Info:
 {git_info}
 
-Suggest smart improvements and output:
+Suggest smart improvements and output in clear sections:
 1. Key suggested changes
-2. Full updated Python code for the main script (self-contained)
+2. Full updated self-contained Python code for the main script
 3. Updated README.md content
-4. Updated requirements.txt
+4. Updated requirements.txt (keep it minimal - no sklearn)
 
-Focus on ASX data, rebound analysis, investment tools, and xAI integration."""
+Focus on ASX rebound analysis, investment tools, and xAI integration. Keep code clean and dependency-free where possible."""
     
     result = call_grok_api(prompt, temperature=0.65, max_tokens=2000)
     st.markdown("### 🤖 Grok Update Recommendation")
@@ -203,228 +205,192 @@ def perform_self_update():
         if st.button("📝 Generate README & requirements.txt", use_container_width=True):
             readme_content = f"""# GeoSupply Rebound Analyzer v{VERSION}
 
-Real-time ASX Shipping & Mining Rebound Analyzer with Grok (xAI) integration and investment simulator.
+Real-time ASX Shipping & Mining Rebound Analyzer with Grok (xAI) integration.
 
 ## Features
-- Live rebound scores + RSI for ASX stocks
+- Live rebound scores + RSI
 - Shipping + Mining tickers
-- Investment return calculator
-- Dedicated Grok-powered self-update tab
-- xAI API authentication
+- Investment return simulator
+- Real xAI Grok API calls
+- Self-updating with Grok intelligence
 
-## Setup
-1. `pip install -r requirements.txt`
-2. Add your xAI API key in the sidebar
-3. `streamlit run geosupply_rebound_analyzer.py`
-
-Built with ❤️ and Grok by xAI • Updated {LAST_UPDATED}
+## Installation
+```bash
+pip install -r requirements.txt
+streamlit run geosupply_rebound_analyzer.py
+Note: No scikit-learn dependency required.
+Last Updated: {LAST_UPDATED}
 """
-            with open("README.md", "w", encoding="utf-8") as f:
-                f.write(readme_content)
-            
-            req_content = """streamlit
+with open("README.md", "w", encoding="utf-8") as f:
+f.write(readme_content)
+req_content = """streamlit
 yfinance
 pandas
 plotly
 requests
 """
-            with open("requirements.txt", "w", encoding="utf-8") as f:
-                f.write(req_content)
-            
-            st.success("✅ README.md and requirements.txt generated successfully!")
-            st.code(readme_content[:800] + "...", language="markdown")
-
-    st.divider()
-    
-    if not os.path.exists(".git"):
-        st.warning("⚠️ Not running inside a git repository.")
-        return
-    
-    with st.spinner("🔍 Git Status"):
-        branch = run_git_command(["branch", "--show-current"]) or "unknown"
-        status = run_git_command(["status", "--short"]) or "clean"
-        st.success(f"**Branch:** `{branch}` | Status: {status}")
-    
-    if st.button("⬇️ Pull Latest Changes from Remote", use_container_width=True):
-        with st.spinner("Pulling..."):
-            pull_out = run_git_command(["pull", "--ff-only"])
-            st.code(pull_out or "Pull successful", language="bash")
-            if "successful" in (pull_out or ""):
-                st.success("✅ Code updated!")
-                st.rerun()
-
-# ===================== MAIN UI =====================
-st.title("⚓ GeoSupply Rebound Analyzer v8.9")
-st.markdown("**ASX Resources & Logistics Edition** • Real-time Data • xAI Grok Integration • Self-Updating")
-
-with st.sidebar:
-    st.header("⚙️ Controls & xAI Authentication")
-    
-    # xAI API Key Input
-    xai_key_input = st.text_input(
-        "🔑 xAI Grok API Key",
-        value=st.session_state.xai_api_key,
-        type="password",
-        help="Get your key from https://console.x.ai"
-    )
-    if st.button("💾 Save xAI API Key"):
-        st.session_state.xai_api_key = xai_key_input
-        st.success("✅ xAI API key saved to session!")
-    
-    model_options = ["grok-beta", "grok-2-latest", "grok-3", "grok-vision"]
-    selected_model = st.selectbox(
-        "🤖 Grok Model",
-        options=model_options,
-        index=model_options.index(st.session_state.selected_model) if st.session_state.selected_model in model_options else 0
-    )
-    st.session_state.selected_model = selected_model
-    st.caption(f"Using: **{selected_model}**")
-
-    investment_amount = st.number_input("Investment Amount (AUD)", min_value=100.0, value=500.0, step=50.0)
-
-    st.divider()
-
-    shipping_options = ["QUBE.AX", "SVW.AX", "TCL.AX", "BAP.AX", "DBI.AX", "PMV.AX", "JBH.AX", "LNC.AX", "AZJ.AX", "KSC.AX", "LAU.AX"]
-    selected_shipping = st.multiselect("ASX Shipping & Logistics", options=shipping_options, default=["QUBE.AX", "SVW.AX", "TCL.AX", "AZJ.AX"])
-
-    mining_options = ["BHP.AX", "RIO.AX", "FMG.AX", "NST.AX", "EVN.AX", "S32.AX", "MIN.AX", "PLS.AX", "LTR.AX", "BOE.AX"]
-    selected_mining = st.multiselect("ASX Mining & Resources", options=mining_options, default=["BHP.AX", "RIO.AX", "FMG.AX", "PLS.AX"])
-
-    selected_tickers = selected_shipping + selected_mining
-
-    st.divider()
-    st.markdown("### v8.9 Highlights")
-    st.markdown("""
-    • Full **xAI Grok API** authentication  
-    • Real Grok API calls in Self-Update tab  
-    • Grok-powered intelligent suggestions  
-    • Secure key handling (session only)
-    """)
-
-# ===================== TABS =====================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "📊 Live Rebound Dashboard",
-    "🔍 Deep Grok Analysis",
-    "📡 Real-Time Data",
-    "🌟 Top Undervalued",
-    "💰 Investment Simulator",
-    "⚠️ Sector Risks",
-    "🚀 Self-Update (Grok)"
-])
-
-# Tab 1: Live Rebound Dashboard
-with tab1:
-    st.subheader("Live Rebound Scores — ASX Resources & Logistics")
-    if not selected_tickers:
-        st.warning("Select tickers in sidebar")
-    else:
-        data_dict = fetch_asx_data(selected_tickers)
-        cols = st.columns(min(4, len(data_dict)))
-        for i, (ticker, info) in enumerate(data_dict.items()):
-            with cols[i % 4]:
-                st.metric(label=f"{ticker}", value=f"${info['current_price']}", delta=f"{info['change_pct']}%")
-                st.caption(f"Rebound: **{info['rebound_score']}** | RSI: {info['rsi']}")
-        
-        if st.button("🔄 Refresh Charts"):
-            st.cache_data.clear()
-            st.rerun()
-        
-        for ticker, info in data_dict.items():
-            if not info['df'].empty:
-                fig = px.line(info['df'], y="Close", title=f"{ticker} 3-Month Trend")
-                fig.update_layout(height=300)
-                st.plotly_chart(fig, use_container_width=True)
-
-# Tab 2: Deep Grok Analysis
-with tab2:
-    st.subheader("🔍 Deep Grok Analysis")
-    query = st.text_area("Enter your analysis request", 
-                        value="Analyse rebound potential for current ASX shipping and mining stocks considering commodity prices and supply chain dynamics.")
-    if st.button("🚀 Run Grok Analysis"):
-        if not st.session_state.xai_api_key:
-            st.error("Please configure your xAI API key in the sidebar first.")
-        else:
-            with st.spinner("Consulting Grok..."):
-                result = call_grok_api(query, temperature=0.7)
-                st.markdown("### Grok Response")
-                st.markdown(result)
-
-# Tab 3: Real-Time Data
-with tab3:
-    st.subheader("📡 Real-Time Data Feed")
-    st.write("Last refreshed:", datetime.now().strftime("%H:%M:%S AEST"))
-    data_dict = fetch_asx_data(selected_tickers)
-    if data_dict:
-        df_summary = pd.DataFrame([{"Ticker": t, **{k: v for k, v in info.items() if k != "df"}} for t, info in data_dict.items()])
-        st.dataframe(df_summary, use_container_width=True, hide_index=True)
-
-# Tab 4: Top Undervalued
-with tab4:
-    st.subheader("🌟 Top Undervalued Rebound Stocks")
-    broad_data = fetch_asx_data(selected_tickers + mining_options)
-    if broad_data:
-        df_broad = pd.DataFrame([
-            {
-                "Ticker": t,
-                "Price": info["current_price"],
-                "Rebound %": info["rebound_score"],
-                "RSI": info["rsi"],
-                "Change %": info["change_pct"],
-                "Volume": info["volume"],
-                "Rebound Potential": round((100 - info["rebound_score"]) + (100 - info["rsi"]) * 0.8, 1)
-            }
-            for t, info in broad_data.items()
-        ])
-        df_broad = df_broad.sort_values("Rebound Potential", ascending=False).reset_index(drop=True)
-        st.dataframe(df_broad, use_container_width=True, hide_index=True)
-        
-        st.markdown("**Top 3 Rebound Opportunities:**")
-        for _, row in df_broad.head(3).iterrows():
-            st.success(f"**{row['Ticker']}** — Potential: {row['Rebound Potential']} | Rebound: {row['Rebound %']}% | RSI: {row['RSI']}")
-
-# Tab 5: Investment Simulator
-with tab5:
-    st.subheader(f"💰 Metrics for ${investment_amount:,.0f} AUD Investment")
-    data_dict = fetch_asx_data(selected_tickers)
-    if data_dict:
-        summary_list = []
-        for ticker, info in data_dict.items():
-            summary_list.append({
-                'Ticker': ticker,
-                'Company': ticker.replace('.AX', '') + " Ltd",
-                'Current Price': info['current_price']
-            })
-        df_invest = pd.DataFrame(summary_list)
-        results = calculate_investment_metrics(df_invest, investment_amount)
-        if not results.empty:
-            st.dataframe(results, use_container_width=True, hide_index=True)
-            best = results.loc[results['Percent Gain %'].idxmax()]
-            st.success(f"**Best Projected Return:** {best['Ticker']} (+{best['Percent Gain %']}%)")
-
-# Tab 6: Sector Risks
-with tab6:
-    st.header("⚠️ Sector Risks & Opportunities — ASX Logistics & Resources")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Key Risks")
-        st.markdown("""
-        - Fuel & energy price volatility
-        - Geopolitical disruptions (Hormuz, Red Sea)
-        - Labour shortages and wage inflation
-        - Commodity price swings
-        """)
-    with col2:
-        st.subheader("Key Opportunities")
-        st.markdown("""
-        - Government infrastructure investment
-        - E-commerce and last-mile growth
-        - Decarbonisation and green contracts
-        - Strong Australian resource exports
-        """)
-
-# Tab 7: Self-Update with Real Grok API
-with tab7:
-    perform_self_update()
-
+with open("requirements.txt", "w", encoding="utf-8") as f:
+f.write(req_content)
+st.success("✅ README.md and requirements.txt generated!")
+st.code(readme_content, language="markdown")
 st.divider()
-st.caption(f"⚓ GeoSupply Rebound Analyzer v{VERSION} — ASX Resources & Logistics | xAI Grok API Integrated | {LAST_UPDATED}")
+if not os.path.exists(".git"):
+st.warning("⚠️ Not running inside a git repository.")
+return
+with st.spinner("🔍 Git Status"):
+branch = run_git_command(["branch", "--show-current"]) or "unknown"
+status = run_git_command(["status", "--short"]) or "clean"
+st.success(f"Branch: {branch} | Status: {status}")
+if st.button("⬇️ Pull Latest Changes from Remote", use_container_width=True):
+with st.spinner("Pulling..."):
+pull_out = run_git_command(["pull", "--ff-only"])
+st.code(pull_out or "Pull successful", language="bash")
+if "successful" in (pull_out or ""):
+st.success("✅ Code updated!")
+st.rerun()
+===================== MAIN UI =====================
+st.title("⚓ GeoSupply Rebound Analyzer v9.0")
+st.markdown("ASX Resources & Logistics Edition • Real-time • xAI Grok API • sklearn-free")
+with st.sidebar:
+st.header("⚙️ Controls & xAI Authentication")
+xai_key_input = st.text_input(
+"🔑 xAI Grok API Key",
+value=st.session_state.xai_api_key,
+type="password",
+help="Get your key from https://console.x.ai"
+)
+if st.button("💾 Save xAI API Key"):
+st.session_state.xai_api_key = xai_key_input
+st.success("✅ xAI API key saved!")
+model_options = ["grok-beta", "grok-2-latest", "grok-3", "grok-vision"]
+selected_model = st.selectbox(
+"🤖 Grok Model",
+options=model_options,
+index=model_options.index(st.session_state.selected_model) if st.session_state.selected_model in model_options else 0
+)
+st.session_state.selected_model = selected_model
+investment_amount = st.number_input("Investment Amount (AUD)", min_value=100.0, value=500.0, step=50.0)
+st.divider()
+shipping_options = ["QUBE.AX", "SVW.AX", "TCL.AX", "BAP.AX", "DBI.AX", "PMV.AX", "JBH.AX", "LNC.AX", "AZJ.AX", "KSC.AX", "LAU.AX"]
+selected_shipping = st.multiselect("ASX Shipping & Logistics", options=shipping_options, default=["QUBE.AX", "SVW.AX", "TCL.AX", "AZJ.AX"])
+mining_options = ["BHP.AX", "RIO.AX", "FMG.AX", "NST.AX", "EVN.AX", "S32.AX", "MIN.AX", "PLS.AX", "LTR.AX", "BOE.AX"]
+selected_mining = st.multiselect("ASX Mining & Resources", options=mining_options, default=["BHP.AX", "RIO.AX", "FMG.AX", "PLS.AX"])
+selected_tickers = selected_shipping + selected_mining
+===================== TABS =====================
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+"📊 Live Rebound Dashboard",
+"🔍 Deep Grok Analysis",
+"📡 Real-Time Data",
+"🌟 Top Undervalued",
+"💰 Investment Simulator",
+"⚠️ Sector Risks",
+"🚀 Self-Update (Grok)"
+])
+Tab 1: Live Dashboard
+with tab1:
+st.subheader("Live Rebound Scores — ASX Resources & Logistics")
+if not selected_tickers:
+st.warning("Select tickers in sidebar")
+else:
+data_dict = fetch_asx_data(selected_tickers)
+cols = st.columns(min(4, len(data_dict)))
+for i, (ticker, info) in enumerate(data_dict.items()):
+with cols[i % 4]:
+st.metric(label=f"{ticker}", value=f"${info['current_price']}", delta=f"{info['change_pct']}%")
+st.caption(f"Rebound: {info['rebound_score']} | RSI: {info['rsi']}")
+if st.button("🔄 Refresh Charts"):
+st.cache_data.clear()
+st.rerun()
+for ticker, info in data_dict.items():
+if not info['df'].empty:
+fig = px.line(info['df'], y="Close", title=f"{ticker} 3-Month Trend")
+fig.update_layout(height=300)
+st.plotly_chart(fig, use_container_width=True)
+Tab 2: Deep Grok Analysis
+with tab2:
+st.subheader("🔍 Deep Grok Analysis")
+query = st.text_area("Enter your analysis request",
+value="Analyse rebound potential for selected ASX shipping and mining stocks given current market conditions.")
+if st.button("🚀 Run Grok Analysis"):
+if not st.session_state.xai_api_key:
+st.error("Please configure your xAI API key in the sidebar first.")
+else:
+with st.spinner("Consulting Grok..."):
+result = call_grok_api(query, temperature=0.7)
+st.markdown("### Grok Response")
+st.markdown(result)
+Tab 3: Real-Time Data
+with tab3:
+st.subheader("📡 Real-Time Data Feed")
+st.write("Last refreshed:", datetime.now().strftime("%H:%M:%S AEST"))
+data_dict = fetch_asx_data(selected_tickers)
+if data_dict:
+df_summary = pd.DataFrame([{"Ticker": t, **{k: v for k, v in info.items() if k != "df"}} for t, info in data_dict.items()])
+st.dataframe(df_summary, use_container_width=True, hide_index=True)
+Tab 4: Top Undervalued
+with tab4:
+st.subheader("🌟 Top Undervalued Rebound Stocks")
+broad_data = fetch_asx_data(selected_tickers + mining_options)
+if broad_data:
+df_broad = pd.DataFrame([
+{
+"Ticker": t,
+"Price": info["current_price"],
+"Rebound %": info["rebound_score"],
+"RSI": info["rsi"],
+"Change %": info["change_pct"],
+"Volume": info["volume"],
+"Rebound Potential": round((100 - info["rebound_score"]) + (100 - info["rsi"]) * 0.8, 1)
+}
+for t, info in broad_data.items()
+])
+df_broad = df_broad.sort_values("Rebound Potential", ascending=False).reset_index(drop=True)
+st.dataframe(df_broad, use_container_width=True, hide_index=True)
+st.markdown("Top 3 Rebound Opportunities:")
+for _, row in df_broad.head(3).iterrows():
+st.success(f"{row['Ticker']} — Potential: {row['Rebound Potential']} | Rebound: {row['Rebound %']}% | RSI: {row['RSI']}")
+Tab 5: Investment Simulator
+with tab5:
+st.subheader(f"💰 Metrics for ${investment_amount:,.0f} AUD Investment")
+data_dict = fetch_asx_data(selected_tickers)
+if data_dict:
+summary_list = []
+for ticker, info in data_dict.items():
+summary_list.append({
+'Ticker': ticker,
+'Company': ticker.replace('.AX', '') + " Ltd",
+'Current Price': info['current_price']
+})
+df_invest = pd.DataFrame(summary_list)
+results = calculate_investment_metrics(df_invest, investment_amount)
+if not results.empty:
+st.dataframe(results, use_container_width=True, hide_index=True)
+best = results.loc[results['Percent Gain %'].idxmax()]
+st.success(f"Best Projected Return: {best['Ticker']} (+{best['Percent Gain %']}%)")
+Tab 6: Sector Risks
+with tab6:
+st.header("⚠️ Sector Risks & Opportunities")
+col1, col2 = st.columns(2)
+with col1:
+st.subheader("Key Risks")
+st.markdown("""
+
+Fuel & energy price volatility
+Geopolitical disruptions
+Labour shortages
+Commodity price swings
+""")
+with col2:
+st.subheader("Key Opportunities")
+st.markdown("""
+Infrastructure investment
+E-commerce growth
+Green transition demand
+Strong resource exports
+""")
+
+Tab 7: Self-Update
+with tab7:
+perform_self_update()
+st.divider()
+st.caption(f"⚓ GeoSupply Rebound Analyzer v{VERSION} — ASX Resources & Logistics | xAI Grok API | No sklearn | {LAST_UPDATED}")
