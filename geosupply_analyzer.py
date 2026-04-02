@@ -121,6 +121,21 @@ def save_credentials(github_token: str, xai_key: str):
     st.success("✅ Credentials saved to session!")
 
 # ===================== GROK API CALL (Enhanced with retries) =====================
+# Add this try/except around your existing Grok call
+try:
+    response = client.chat.completions.create(...)   # ← your current call
+except Exception as e:
+    print("=== FULL GROK ERROR ===")
+    print(type(e))
+    print(e)
+    if hasattr(e, "response") and e.response is not None:
+        print(e.response.text)          # ← this shows the exact reason
+        import json
+        try:
+            print(json.dumps(e.response.json(), indent=2))
+        except:
+            pass
+    raise
 def call_grok_api(prompt: str, temperature: float = 0.7, max_tokens: int = 1200) -> str:
     """Call xAI Grok API with retry logic and better error handling."""
     api_key = st.session_state.xai_api_key or secrets.get("xai_api_key", "")

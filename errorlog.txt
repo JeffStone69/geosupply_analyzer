@@ -1,0 +1,97 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 2026-04-01 12:28:15,725 - ERROR - Git pull failed: remote: Invalid username or token. Password authentication is not supported for Git operations.\
+fatal: Authentication failed for 'https://github.com/JeffStone69/geosupply_analyzer.git/'\
+\
+2026-04-01 12:28:55,503 - ERROR - Git pull failed: remote: Invalid username or token. Password authentication is not supported for Git operations.\
+fatal: Authentication failed for 'https://github.com/JeffStone69/geosupply_analyzer.git/'\
+\
+2026-04-01 12:30:07,638 - ERROR - Git pull failed: remote: Invalid username or token. Password authentication is not supported for Git operations.\
+fatal: Authentication failed for 'https://github.com/JeffStone69/geosupply_analyzer.git/'\
+\
+2026-04-01 14:43:37,484 - ERROR - Git pull failed: remote: Invalid username or token. Password authentication is not supported for Git operations.\
+fatal: Authentication failed for 'https://github.com/JeffStone69/geosupply_analyzer.git/'\
+\
+2026-04-01 14:45:12,066 - ERROR - Git pull failed: remote: Invalid username or token. Password authentication is not supported for Git operations.\
+fatal: Authentication failed for 'https://github.com/JeffStone69/geosupply_analyzer.git/'\
+\
+2026-04-01 15:28:04,193 - ERROR - Git pull failed: error: cannot pull with rebase: You have unstaged changes.\
+error: Please commit or stash them.\
+\
+2026-04-01 15:57:25,041 - ERROR - Git pull failed: error: cannot pull with rebase: You have unstaged changes.\
+error: Please commit or stash them.\
+\
+2026-04-01 16:07:15,210 - ERROR - Git pull failed: error: cannot pull with rebase: You have unstaged changes.\
+error: Please commit or stash them.\
+\
+2026-04-02 08:48:06,565 - ERROR - Traceback (most recent call last):\
+  File "/Users/jeff/Downloads/XAi/TSLAWEB/geosupply_analyzer/geosupply_analyzer/geosupply_analyzer.py", line 180, in self_update\
+    subprocess.check_call(["git", "status"], timeout=10, capture_output=True)\
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 414, in check_call\
+    retcode = call(*popenargs, **kwargs)\
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 395, in call\
+    with Popen(*popenargs, **kwargs) as p:\
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\
+TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'\
+\
+2026-04-02 09:16:12,232 - ERROR - Traceback (most recent call last):\
+  File "/Users/jeff/Downloads/XAi/TSLAWEB/geosupply_analyzer/geosupply_analyzer/geosupply_analyzer.py", line 180, in self_update\
+    subprocess.check_call(["git", "status"], timeout=10, capture_output=True)\
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 414, in check_call\
+    retcode = call(*popenargs, **kwargs)\
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 395, in call\
+    with Popen(*popenargs, **kwargs) as p:\
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\
+TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'\
+\
+2026-04-02 09:24:13,554 - ERROR - Git pull failed: fatal: Cannot rebase onto multiple branches.\
+2026-04-02 11:58:04,794 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 11:58:06,688 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 11:58:26,221 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 11:58:26,984 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 11:58:43,644 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 11:58:44,392 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 11:59:04,531 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 11:59:05,455 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:01:00,067 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:01:00,795 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:14:17,686 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:14:19,318 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:14:36,191 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:14:36,942 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:14:45,963 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:14:46,667 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:15:03,600 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:15:04,358 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:15:24,651 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:15:25,559 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:16:02,870 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:16:03,595 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:16:09,848 - ERROR - Grok API error after 4 attempts: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions\
+2026-04-02 12:17:51,834 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:17:52,583 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:18:04,937 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:18:05,764 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:18:28,115 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:18:29,040 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:18:54,887 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:18:55,620 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:27:27,488 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:27:28,256 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:30:39,167 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:30:40,702 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:31:03,401 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:31:04,317 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:31:28,128 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:31:28,895 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:32:15,750 - ERROR - HTTP Error 404: \{"quoteSummary":\{"result":null,"error":\{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"\}\}\}\
+2026-04-02 12:32:16,838 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")\
+2026-04-02 12:32:23,955 - ERROR - Grok API error after 4 attempts: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions\
+}
