@@ -95,4 +95,4 @@ for _, row in df.iterrows():
 
     results.append({
         'Ticker': row['Ticker'],
-        'Shares (approx)': round(shares)
+        'Shares (approx)': round(shares)})
