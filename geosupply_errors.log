@@ -103,3 +103,13 @@ TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'
 2026-04-02 13:06:26,833 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
 2026-04-02 13:06:52,189 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
 2026-04-02 13:06:53,286 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 13:46:12,865 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 13:46:14,541 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 13:49:02,044 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 13:49:02,805 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 13:49:12,245 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 13:49:13,189 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 13:50:14,771 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 13:50:15,508 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 14:02:03,162 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 14:02:04,010 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
