@@ -101,3 +101,5 @@ TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'
 2026-04-02 13:06:18,704 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
 2026-04-02 13:06:26,108 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
 2026-04-02 13:06:26,833 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 13:06:52,189 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 13:06:53,286 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
