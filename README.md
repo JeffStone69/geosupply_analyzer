@@ -1,18 +1,14 @@
-# GeoSupply Rebound Analyzer v8.9
+# GeoSupply Rebound Analyzer v8.9 (ASX Focused)
 
-Real-time ASX Shipping & Mining Rebound Analyzer with Grok (xAI) integration and investment simulator.
+A Streamlit-based financial analysis tool designed to identify rebound opportunities in ASX-listed stocks. This app integrates real-time data, advanced technical indicators, portfolio risk analysis, and xAI-driven sentiment insights (mocked for now).
 
 ## Features
-- Live rebound scores + RSI for ASX stocks
-- Shipping + Mining tickers
-- Investment return calculator
-- Dedicated Grok-powered self-update tab
-- xAI API authentication
+- **Real-Time ASX Data**: Fetches live stock data for ASX companies using `yfinance`.
+- **Rebound Analysis**: Detects potential rebounds using moving averages (20-day, 50-day) and RSI (Relative Strength Index).
+- **Investment Tools**: Includes portfolio risk analysis with annualized volatility calculations.
+- **xAI Integration**: Provides sentiment analysis and predictive insights (mocked API for demonstration).
+- **Interactive Visualizations**: Uses Plotly for dynamic stock price and indicator charts.
+- **Error Logging**: Logs issues to `geosupply_errors.log` for debugging.
 
-## Setup
-1. `pip install -r requirements.txt`
-2. Add your xAI API key in the sidebar
-3. `streamlit run geosupply_rebound_analyzer.py`
-
-Built with ❤️ and Grok by xAI • Updated April 2026
-...
+## Installation
+1. Clone the repository:
