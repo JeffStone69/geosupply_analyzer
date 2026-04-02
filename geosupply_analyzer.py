@@ -121,21 +121,6 @@ def save_credentials(github_token: str, xai_key: str):
     st.success("✅ Credentials saved to session!")
 
 # ===================== GROK API CALL (Enhanced with retries) =====================
-# Add this try/except around your existing Grok call
-try:
-    response = client.chat.completions.create(...)   # ← your current call
-except Exception as e:
-    print("=== FULL GROK ERROR ===")
-    print(type(e))
-    print(e)
-    if hasattr(e, "response") and e.response is not None:
-        print(e.response.text)          # ← this shows the exact reason
-        import json
-        try:
-            print(json.dumps(e.response.json(), indent=2))
-        except:
-            pass
-    raise
 def call_grok_api(prompt: str, temperature: float = 0.7, max_tokens: int = 1200) -> str:
     """Call xAI Grok API with retry logic and better error handling."""
     api_key = st.session_state.xai_api_key or secrets.get("xai_api_key", "")
@@ -144,16 +129,19 @@ def call_grok_api(prompt: str, temperature: float = 0.7, max_tokens: int = 1200)
         return "API key not configured."
 
     model = st.session_state.selected_model
+
+    # ✅ Updated valid models — April 2026 (no more -0309 suffix)
     valid_models = {
-        "grok-4.20-0309-reasoning",
-        "grok-4.20-0309-non-reasoning",
-        "grok-4.20-multi-agent-0309",
+        "grok-4.20-reasoning",
+        "grok-4.20-non-reasoning",
+        "grok-4.20-multi-agent",
         "grok-4-1-fast-reasoning",
-        "grok-4-1-fast-non-reasoning"
+        "grok-4-1-fast-non-reasoning",
     }
+
     if model not in valid_models:
-        st.warning(f"Model {model} not recognized. Falling back to grok-4.20-0309-reasoning")
-        model = "grok-4.20-0309-reasoning"
+        st.warning(f"Model '{model}' not recognized. Falling back to grok-4.20-reasoning")
+        model = "grok-4.20-reasoning"
         st.session_state.selected_model = model
 
     url = "https://api.x.ai/v1/chat/completions"
@@ -173,18 +161,31 @@ def call_grok_api(prompt: str, temperature: float = 0.7, max_tokens: int = 1200)
         try:
             with st.spinner(f"Consulting {model} (attempt {attempt+1})..."):
                 response = requests.post(url, json=payload, headers=headers, timeout=30)
-                if response.status_code == 429:
+                
+                # ✅ NEW: Show the exact error message from xAI when it fails
+                if response.status_code != 200:
+                    error_text = response.text
+                    logging.error(f"Grok API error {response.status_code}: {error_text}")
+                    st.error(f"Grok API error {response.status_code}: {error_text[:300]}...")
                     if attempt < max_retries:
                         time.sleep(2 ** attempt)
                         continue
+                    return f"API Error {response.status_code}: {error_text[:200]}"
+
                 response.raise_for_status()
                 data = response.json()
                 return data["choices"][0]["message"]["content"].strip()
-        except Exception as e:
+
+        except requests.exceptions.RequestException as e:
             if attempt == max_retries:
                 logging.error(f"Grok API error after {max_retries+1} attempts: {str(e)}")
-                return f"API Error: {str(e)}. Check your key, quota, or internet connection."
+                return f"API Error: {str(e)}. Check your key, quota, or internet."
             time.sleep(1.5)
+            continue
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            if attempt == max_retries:
+                return f"Unexpected error: {str(e)}"
             continue
     return "Max retries exceeded."
 
