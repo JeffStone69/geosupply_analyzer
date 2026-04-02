@@ -113,3 +113,12 @@ TypeError: Popen.__init__() got an unexpected keyword argument 'capture_output'
 2026-04-02 13:50:15,508 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
 2026-04-02 14:02:03,162 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
 2026-04-02 14:02:04,010 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 14:03:00,484 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 14:03:01,216 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 14:03:28,100 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 14:03:28,836 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 14:12:28,407 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 14:12:29,219 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 14:12:57,131 - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: SLH.AX"}}}
+2026-04-02 14:12:57,967 - ERROR - $SLH.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-02 14:15:03,107 - ERROR - Grok API error after 4 attempts: HTTPSConnectionPool(host='api.x.ai', port=443): Read timed out. (read timeout=30)
