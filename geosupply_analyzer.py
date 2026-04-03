@@ -36,20 +36,24 @@ def load_saved_analyses():
         try:
             with open(SAVED_LOG, "r", encoding="utf-8") as f:
                 for line in f:
-                    if line.strip():
+                    line = line.strip()
+                    if line:
                         st.session_state.saved_analyses.append(json.loads(line))
         except Exception as e:
             st.warning(f"Could not load saved.log: {e}")
 
 def save_analysis(analysis: dict):
     try:
+        os.makedirs(os.path.dirname(SAVED_LOG) or ".", exist_ok=True)
         with open(SAVED_LOG, "a", encoding="utf-8") as f:
-            f.write(json.dumps(analysis) + "\n")
+            f.write(json.dumps(analysis, ensure_ascii=False) + "\n")
         if "saved_analyses" not in st.session_state:
             st.session_state.saved_analyses = []
         st.session_state.saved_analyses.append(analysis)
+        return True
     except Exception as e:
         st.error(f"Failed to save to saved.log: {e}")
+        return False
 
 def add_page_analyzer(tab_name: str, page_context: str = "", model: str = "grok-4.20-reasoning"):
     with st.expander("Analyse this page with Grok", expanded=False):
@@ -58,7 +62,7 @@ def add_page_analyzer(tab_name: str, page_context: str = "", model: str = "grok-
         if st.button("Analyse Page with Grok", key=f"analyze_btn_{tab_name}", use_container_width=True):
             with st.spinner("Grok is analysing this page..."):
                 full_prompt = f"""
-You are analysing the **'{tab_name}'** tab of the GeoSupply Rebound Analyzer (v10.8).
+You are analysing the **'{tab_name}'** tab of the GeoSupply Rebound Analyzer (v10.9).
 CURRENT PAGE CONTEXT: {page_context or "No specific data summary."}
 USER REQUEST: {user_prompt or "General troubleshooting and improvement suggestions."}
 TASK: 1. Bugs/UX issues 2. Actionable improvements 3. Ideas for $500 users 4. Code optimisations.
@@ -68,9 +72,15 @@ Be concise and number your suggestions.
                 st.markdown("### Grok's Page Analysis")
                 st.write(response)
                 if st.button("Save this Grok Analysis", key=f"save_btn_{tab_name}", use_container_width=True):
-                    analysis = {"tab": tab_name, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "model_used": model, "user_prompt": user_prompt or "General analysis", "response": response}
-                    save_analysis(analysis)
-                    st.success("Analysis saved permanently to saved.log!")
+                    analysis = {
+                        "tab": tab_name,
+                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "model_used": model,
+                        "user_prompt": user_prompt or "General analysis",
+                        "response": response
+                    }
+                    if save_analysis(analysis):
+                        st.success("Analysis saved permanently to saved.log!")
 
 @st.cache_data(ttl=300)
 def fetch_batch_data(tickers: List[str], period: str = "6mo") -> Dict[str, pd.DataFrame]:
@@ -81,7 +91,7 @@ def fetch_batch_data(tickers: List[str], period: str = "6mo") -> Dict[str, pd.Da
         for ticker in tickers:
             if len(tickers) == 1:
                 df = data.copy()
-            elif ticker in data.columns.get_level_values(0):
+            elif isinstance(data.columns, pd.MultiIndex) and ticker in data.columns.get_level_values(0):
                 df = data[ticker].copy()
             else:
                 continue
@@ -167,7 +177,7 @@ def main():
     if "grok_api_key" not in st.session_state:
         st.session_state.grok_api_key = ""
     st.title("GeoSupply Rebound Analyzer")
-    st.caption("**v10.8** • Grok analyses now saved permanently to saved.log")
+    st.caption("**v10.9** • Grok analyses now saved reliably to saved.log")
     with st.sidebar:
         st.header("Controls")
         grok_key = st.text_input("Grok API Key", type="password", value=st.session_state.grok_api_key, help="Get key at https://x.ai/api")
@@ -317,8 +327,8 @@ Be specific and actionable.
                     st.write(strategy_response)
                     if st.button("Save Strategy Analysis"):
                         analysis = {"tab": "Strategy", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "model_used": selected_model, "user_prompt": "Portfolio strategy", "response": strategy_response}
-                        save_analysis(analysis)
-                        st.success("Saved!")
+                        if save_analysis(analysis):
+                            st.success("Saved!")
         else:
             st.info("No data yet.")
         add_page_analyzer("Strategy & Grok Insights", "Strategy tab with Grok-powered $500 portfolio suggestions", selected_model)
@@ -342,7 +352,7 @@ Be specific and actionable.
             st.success("saved.log cleared!")
             st.rerun()
         add_page_analyzer("Saved Analyses", "Meta-tab showing all saved Grok feedback", selected_model)
-    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | v10.8 • Analyses saved to saved.log")
+    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | v10.9 • Analyses saved reliably to saved.log")
 
 if __name__ == "__main__":
     main()
