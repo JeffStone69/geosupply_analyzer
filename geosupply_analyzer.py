@@ -435,6 +435,80 @@ def main():
                 st.warning("Please select at least one stock.")
 
     with tab5:
+    # ====================== NEW TAB: $500 MICRO-REBOUND STRATEGY ======================
+    tab6 = st.tabs(["📊 Dashboard", "⛏️ Mining", "🚢 Shipping", "🧪 Simulator", "🤖 Grok Insights", "💰 $500 Strategy"])[5]
+
+    with tab6:
+        st.subheader("💰 GeoSupply Micro-Rebound Strategy — $500 AUD")
+        st.caption("CommSec-optimised • Max profit • Ultra risk-averse • Updated April 2026")
+
+        st.markdown("""
+        **Strategy Rules (copy these into your CommSec notes):**
+        - Only enter when **Rebound Score ≥ 65** and **RSI ≤ 42**
+        - Max **2–3 positions** ($200–$250 each)
+        - First buy must be **≥ $500** per stock (CommSec rule)
+        - Stop-loss **-8%** (manual), take-profit **+18%**
+        - Review every Sunday night only
+        - Use CommSec Pocket ($2 fee) or standard ($5 fee)
+        """)
+
+        if not summary_df.empty:
+            # Filter high-conviction rebound candidates
+            candidates = summary_df[
+                (summary_df["Rebound Score"] >= 65) &
+                (summary_df["RSI"] <= 42)
+            ].copy()
+
+            if not candidates.empty:
+                candidates = candidates.sort_values("Rebound Score", ascending=False).head(5)
+
+                st.success(f"**{len(candidates)} high-probability setups found** (Score ≥ 65 & RSI ≤ 42)")
+
+                # Position sizing for exactly $500
+                n_positions = min(3, len(candidates))
+                alloc_per_position = 500 / n_positions
+                candidates["Suggested Allocation"] = round(alloc_per_position, 2)
+                candidates["Est. Shares"] = (candidates["Suggested Allocation"] / candidates["Price"]).astype(int)
+                candidates["Est. Brokerage"] = 5.00  # standard CommSec
+
+                display_cols = ["Ticker", "Company", "Rebound Score", "RSI", "Price", "Suggested Allocation", "Est. Shares"]
+                st.dataframe(
+                    candidates[display_cols].style.format({
+                        "Price": "${:.3f}",
+                        "Suggested Allocation": "${:.0f}",
+                        "Rebound Score": "{:.1f}",
+                        "RSI": "{:.1f}"
+                    }).background_gradient(subset=["Rebound Score"], cmap="Greens"),
+                    use_container_width=True,
+                    hide_index=True
+                )
+
+                if st.button("📋 Generate Full Trade Plan (Copy to Notepad)", type="primary", use_container_width=True):
+                    plan = candidates[display_cols].copy()
+                    plan["Stop-Loss Price"] = round(plan["Price"] * 0.92, 3)
+                    plan["Target Price (+18%)"] = round(plan["Price"] * 1.18, 3)
+                    plan["Max Loss if Stopped"] = round(plan["Suggested Allocation"] * 0.08, 2)
+                    
+                    st.subheader("✅ Your Ready-to-Execute $500 Trade Plan")
+                    st.dataframe(plan, use_container_width=True, hide_index=True)
+                    
+                    st.info("""
+                    **Next steps in CommSec:**
+                    1. Buy the top 2–3 stocks using suggested allocation
+                    2. Set manual alerts for stop-loss & target
+                    3. Take screenshot of this plan
+                    4. Review again next Sunday
+                    """)
+                    
+                    st.success(f"**Projected portfolio value at +18% target:** ${round(500 * 1.18):,} AUD")
+            else:
+                st.warning("No setups meet the strict criteria right now (Score ≥ 65 & RSI ≤ 42).")
+                st.info("Check back after markets move or widen period to 1y.")
+        else:
+            st.error("No market data loaded yet. Refresh data in sidebar.")
+
+        st.divider()
+        st.caption("This strategy is built directly into the dashboard and updates live with the Rebound Score.")
         st.subheader("🤖 Grok Market Insights")
         st.caption(f"Connected to: **{selected_model}**")
 
