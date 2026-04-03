@@ -298,3 +298,9 @@
 2026-04-03 13:11:14,632 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
 2026-04-03 13:11:24,492 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
 2026-04-03 13:26:29,739 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 13:28:46,402 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 13:29:08,635 - WARNING - Failed to process BHP.AX: ['Close']
+2026-04-03 13:29:09,129 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 13:29:15,101 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 13:29:24,138 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 13:29:36,009 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
