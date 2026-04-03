@@ -270,3 +270,27 @@
 2026-04-03 12:30:31,347 - ERROR - 
 1 Failed download:
 2026-04-03 12:30:31,347 - ERROR - ['LNC.AX']: possibly delisted; no price data found  (period=3mo)
+2026-04-03 12:34:49,633 - ERROR - $QUBE.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:34:49,643 - ERROR - 
+1 Failed download:
+2026-04-03 12:34:49,643 - ERROR - ['QUBE.AX']: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:34:50,576 - ERROR - $SVW.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:34:50,577 - ERROR - 
+1 Failed download:
+2026-04-03 12:34:50,577 - ERROR - ['SVW.AX']: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:35:01,979 - ERROR - $QUBE.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:35:01,986 - ERROR - 
+1 Failed download:
+2026-04-03 12:35:01,986 - ERROR - ['QUBE.AX']: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:35:03,230 - ERROR - $SVW.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:35:03,232 - ERROR - 
+1 Failed download:
+2026-04-03 12:35:03,232 - ERROR - ['SVW.AX']: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:35:07,666 - ERROR - $QUBE.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:35:07,674 - ERROR - 
+1 Failed download:
+2026-04-03 12:35:07,675 - ERROR - ['QUBE.AX']: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:35:08,545 - ERROR - $SVW.AX: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 12:35:08,553 - ERROR - 
+1 Failed download:
+2026-04-03 12:35:08,553 - ERROR - ['SVW.AX']: possibly delisted; no price data found  (period=3mo) (Yahoo error = "No data found, symbol may be delisted")
