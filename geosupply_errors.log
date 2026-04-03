@@ -45,3 +45,8 @@
 2026-04-03 18:48:22,596 - ERROR - 
 2 Failed downloads:
 2026-04-03 18:48:22,596 - ERROR - ['SYD.AX', 'CXM.AX']: possibly delisted; no price data found  (period=1mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 20:42:12,072 - ERROR - $SYD.AX: possibly delisted; no price data found  (period=1mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 20:42:13,136 - ERROR - $CXM.AX: possibly delisted; no price data found  (period=1mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-03 20:42:13,148 - ERROR - 
+2 Failed downloads:
+2026-04-03 20:42:13,148 - ERROR - ['SYD.AX', 'CXM.AX']: possibly delisted; no price data found  (period=1mo) (Yahoo error = "No data found, symbol may be delisted")
