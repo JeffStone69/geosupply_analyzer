@@ -2,3 +2,8 @@
 2026-04-03 13:45:12,222 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
 2026-04-03 13:53:09,548 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
 2026-04-03 13:56:56,405 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 15:09:13,831 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 15:10:15,496 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 15:10:34,017 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
+2026-04-03 15:12:10,075 - WARNING - Failed to process TSLA: ['Close']
+2026-04-03 15:12:23,215 - ERROR - Grok API error: 400 Client Error: Bad Request for url: https://api.x.ai/v1/chat/completions
