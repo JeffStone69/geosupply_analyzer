@@ -145,25 +145,19 @@ Suggest improvements and output:
 3. Updated README.md content
 4. Updated requirements.txt (no sklearn)"""
     result = call_grok_api(prompt, temperature=0.65, max_tokens=2000)
-    st.markdown("### 🤖 Grok Update Recommendation")
     st.markdown(result)
 
-def perform_self_update():
-    st.subheader("🚀 Grok-Powered Self Update")
-    col_a, col_b = st.columns(2)
-    with col_a:
-        if st.button("🔍 Get Grok Update Suggestion", type="primary", use_container_width=True):
-            grok_suggest_update()
-    with col_b:
-        if st.button("📝 Generate README & requirements.txt", use_container_width=True):
-            readme_content = "# GeoSupply Rebound Analyzer v" + VERSION + "\n\nReal-time ASX Shipping & Mining Rebound Analyzer with Grok (xAI) integration.\n\n## Features\n- Live rebound scores + RSI\n- Shipping + Mining tickers\n- Investment simulator\n- Real xAI Grok API\n- Self-updating\n\n## Installation\npip install -r requirements.txt\nstreamlit run geosupply_rebound_analyzer.py\n\nNote: No scikit-learn required.\n\nLast Updated: " + LAST_UPDATED
-            with open("README.md", "w", encoding="utf-8") as f:
-                f.write(readme_content)
-            req_content = "streamlit\nyfinance\npandas\nplotly\nrequests\n"
-            with open("requirements.txt", "w", encoding="utf-8") as f:
-                f.write(req_content)
-            st.success("✅ README.md and requirements.txt generated!")
-            st.code(readme_content, language="markdown")
+def perform_utilities():
+    st.subheader("🛠️ Utilities")
+    if st.button("📝 Generate README & requirements.txt", use_container_width=True):
+        readme_content = "# GeoSupply Rebound Analyzer v" + VERSION + "\n\nReal-time ASX Shipping & Mining Rebound Analyzer with Grok (xAI) integration.\n\n## Features\n- Live rebound scores + RSI\n- Shipping + Mining tickers\n- Investment simulator\n- Real xAI Grok API\n- Self-updating\n\n## Installation\npip install -r requirements.txt\nstreamlit run geosupply_rebound_analyzer.py\n\nNote: No scikit-learn required.\n\nLast Updated: " + LAST_UPDATED
+        with open("README.md", "w", encoding="utf-8") as f:
+            f.write(readme_content)
+        req_content = "streamlit\nyfinance\npandas\nplotly\nrequests\n"
+        with open("requirements.txt", "w", encoding="utf-8") as f:
+            f.write(req_content)
+        st.success("✅ README.md and requirements.txt generated!")
+        st.code(readme_content, language="markdown")
     st.divider()
     if not os.path.exists(".git"):
         st.warning("⚠️ Not a git repository.")
@@ -176,9 +170,10 @@ def perform_self_update():
         with st.spinner("Pulling..."):
             pull_out = run_git_command(["pull", "--ff-only"])
             st.code(pull_out or "Pull successful", language="bash")
-            if "successful" in (pull_out or ""):
-                st.success("✅ Updated!")
-                st.rerun()
+            st.success("✅ Updated!")
+            st.rerun()
+    st.subheader("📜 Recent Git History")
+    st.code(get_git_logs(), language="text")
 
 st.title("⚓ GeoSupply Rebound Analyzer v9.2")
 st.markdown("**ASX Resources & Logistics Edition** • Real-time • xAI Grok API • Clean")
@@ -200,7 +195,7 @@ with st.sidebar:
     selected_mining = st.multiselect("ASX Mining & Resources", options=mining_options, default=["BHP.AX", "RIO.AX", "FMG.AX", "PLS.AX"])
     selected_tickers = selected_shipping + selected_mining
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["📊 Live Rebound Dashboard", "🔍 Deep Grok Analysis", "📡 Real-Time Data", "🌟 Top Undervalued", "💰 Investment Simulator", "⚠️ Sector Risks", "🚀 Self-Update (Grok)"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["📊 Live Rebound Dashboard", "🔍 Grok AI Assistant", "📡 Real-Time Data", "🌟 Top Undervalued", "💰 Investment Simulator", "⚠️ Sector Risks", "🛠️ Utilities"])
 
 with tab1:
     st.subheader("Live Rebound Scores — ASX Resources & Logistics")
@@ -233,6 +228,10 @@ with tab2:
                 result = call_grok_api(query, temperature=0.7)
                 st.markdown("### Grok Response")
                 st.markdown(result)
+    st.divider()
+    st.subheader("🤖 Grok Update Recommendation")
+    if st.button("🔍 Get Grok Update Suggestion", type="primary", use_container_width=True):
+        grok_suggest_update()
 
 with tab3:
     st.subheader("📡 Real-Time Data Feed")
@@ -276,7 +275,7 @@ with tab6:
         st.markdown("- Infrastructure investment\n- E-commerce growth\n- Green transition demand\n- Strong resource exports")
 
 with tab7:
-    perform_self_update()
+    perform_utilities()
 
 st.divider()
 st.caption(f"⚓ GeoSupply Rebound Analyzer v{VERSION} — ASX Resources & Logistics | xAI Grok API | Clean & sklearn-free | {LAST_UPDATED}")
