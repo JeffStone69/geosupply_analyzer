@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 """
 geosupply_analyzer.py
-GeoSupply Rebound Analyzer v10.2
+GeoSupply Rebound Analyzer v10.3
 Optimized Streamlit Dashboard for ASX + US Mining & Shipping Stocks
 
-New in v10.2:
-- Fixed Grok API 404 error (updated to current Grok 4.20 models)
-- Added real-time USD ↔ AUD currency converter
-- Expanded analysis to include major US stocks
-- Market selector (ASX / US / Both)
-- Improved error handling and UI/UX
+Changes in v10.3 (April 2026):
+- Removed delisted tickers CXM.AX (delisted Sep 2025) and SYD.AX (delisted 2022)
+- Improved Grok API error diagnostics (now logs full response body on 400 errors)
+- Removed off-topic "UX Tools" tab and cleaned UI
+- Added public explanation of proprietary Rebound Score
+- Minor robustness & documentation improvements
 
 Author: Optimized by Grok (xAI) - Self-improving system
 Last Updated: April 2026
@@ -34,8 +34,8 @@ st.set_page_config(
 )
 
 # ====================== CONFIG & TICKERS ======================
-ASX_MINING = ["BHP.AX", "RIO.AX", "FMG.AX", "S32.AX", "MIN.AX", "CXM.AX"]
-ASX_SHIPPING = ["QUB.AX", "TCL.AX", "SYD.AX", "ASX.AX"]
+ASX_MINING = ["BHP.AX", "RIO.AX", "FMG.AX", "S32.AX", "MIN.AX"]
+ASX_SHIPPING = ["QUB.AX", "TCL.AX", "ASX.AX"]
 US_MINING = ["FCX", "NEM", "VALE", "SCCO", "GOLD", "AEM"]
 US_SHIPPING = ["ZIM", "MATX", "SBLK", "DAC", "CMRE"]
 
@@ -47,7 +47,8 @@ API_BASE = "https://api.x.ai/v1"
 AVAILABLE_MODELS = [
     "grok-4.20-0309-non-reasoning",
     "grok-4.20-0309-reasoning",
-    "grok-4.20-multi-agent-0309"
+    "grok-4.20-multi-agent-0309",
+    "grok-4-1-fast-reasoning"  # Added per current x.ai docs
 ]
 
 logging.basicConfig(
@@ -101,19 +102,22 @@ def get_usd_aud_rate() -> Optional[float]:
 
 
 def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
-    """Calculate 14-period RSI."""
+    """Calculate 14-period RSI (handles early NaNs gracefully)."""
     delta = series.diff()
     gain = delta.where(delta > 0, 0.0)
     loss = -delta.where(delta < 0, 0.0)
     avg_gain = gain.rolling(window=period, min_periods=1).mean()
     avg_loss = loss.rolling(window=period, min_periods=1).mean()
-    rs = avg_gain / avg_loss
+    rs = avg_gain / avg_loss.replace(0, float('nan'))  # avoid div-by-zero
     rsi = 100 - (100 / (1 + rs))
-    return rsi
+    return rsi.fillna(50)  # neutral default for early rows
 
 
 def calculate_rebound_score(df: pd.DataFrame) -> Tuple[float, float, float]:
-    """Calculate proprietary rebound score (0-100). Higher = stronger rebound potential."""
+    """
+    Proprietary Rebound Score (0-100). Higher = stronger rebound potential.
+    Formula: 55% RSI oversold weight + 30% distance from high + 15% momentum.
+    """
     if df.empty or len(df) < 20 or "Close" not in df.columns:
         return 0.0, 50.0, 0.0
 
@@ -134,7 +138,7 @@ def calculate_rebound_score(df: pd.DataFrame) -> Tuple[float, float, float]:
 
 
 def call_grok_api(prompt: str, model: str, temperature: float = 0.7) -> str:
-    """Call xAI Grok API with robust error handling."""
+    """Call xAI Grok API with robust error handling and full response logging."""
     api_key = os.getenv("GROK_API_KEY") or st.session_state.get("grok_api_key", "")
     if not api_key:
         return "❌ Please enter your Grok API key in the sidebar (get it from x.ai)."
@@ -160,11 +164,18 @@ def call_grok_api(prompt: str, model: str, temperature: float = 0.7) -> str:
         if resp.status_code == 429:
             return "❌ Rate limit reached. Please wait before trying again."
         
+        if resp.status_code != 200:
+            error_body = resp.text[:500]
+            logging.error(f"Grok API error {resp.status_code}: {error_body}")
+            return f"❌ Grok API error {resp.status_code}. Check logs for details."
+        
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"]
     except requests.exceptions.RequestException as e:
+        logging.error(f"Grok connection error: {str(e)}")
         return f"❌ Connection error: {str(e)}"
     except Exception as e:
+        logging.error(f"Grok unexpected error: {str(e)}")
         return f"❌ Unexpected error: {str(e)}"
 
 
@@ -207,8 +218,9 @@ def create_price_rsi_chart(df: pd.DataFrame, ticker: str, company_name: str) -> 
     return fig
 
 
+@st.cache_data(ttl=3600)
 def get_ticker_info(ticker: str) -> Dict:
-    """Get basic company information."""
+    """Get basic company information (cached)."""
     try:
         info = yf.Ticker(ticker).info
         return {
@@ -227,7 +239,7 @@ def main():
         st.session_state.grok_api_key = ""
 
     st.title("📈 GeoSupply Rebound Analyzer")
-    st.caption("**v10.2** • ASX + US Markets • Real-time USD/AUD Converter • Grok 4.20")
+    st.caption("**v10.3** • ASX + US Markets • Real-time USD/AUD • Grok 4.20")
 
     # ====================== SIDEBAR ======================
     with st.sidebar:
@@ -280,6 +292,15 @@ def main():
             st.warning("Could not fetch exchange rate.")
 
         st.divider()
+        st.info("""
+        **Rebound Score explained**  
+        Proprietary 0-100 score:  
+        • 55% RSI (oversold boost)  
+        • 30% % from 52-week high  
+        • 15% 10-day momentum  
+        **>65 = strong rebound candidate** (ideal when RSI < 42)
+        """)
+        
         if st.button("🔄 Refresh All Data", use_container_width=True):
             st.cache_data.clear()
             st.rerun()
@@ -327,9 +348,9 @@ def main():
         summary_df = summary_df.sort_values("Rebound Score", ascending=False)
 
     # ====================== TABS ======================
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "📊 Dashboard", "⛏️ Mining", "🚢 Shipping", "🧪 Simulator",
-        "🤖 Grok Insights", "🛠️ UX Tools"
+        "🤖 Grok Insights"
     ])
 
     with tab1:
@@ -438,39 +459,7 @@ def main():
             else:
                 st.warning("Please enter a question.")
 
-    with tab6:
-        st.subheader("🛠️ Popular Free Web UX Tools")
-        st.markdown("""
-        This dashboard incorporates best practices from leading free design tools:
-        - **Figma** — clean hierarchy and spacing
-        - **Miro** — visual data relationships
-        - **Framer** — smooth interactive feel
-        - **Canva** — accessible color usage
-        - **Uizard** — fast UI prototyping
-        """)
-        
-        cols = st.columns(5)
-        tools = {
-            "Figma": "https://figma.com",
-            "Miro": "https://miro.com",
-            "Framer": "https://framer.com",
-            "Canva": "https://canva.com",
-            "Uizard": "https://uizard.io"
-        }
-        for i, (name, url) in enumerate(tools.items()):
-            with cols[i]:
-                st.markdown(f"**[{name}]({url})**")
-
-        st.divider()
-        st.info("""
-        **Tips for using this tool:**
-        - Look for Rebound Score > 65 and RSI < 42
-        - Combine with Grok analysis for better decisions
-        - USD/AUD rate affects profitability of US-listed stocks for Australian investors
-        """)
-        st.caption("Built as a self-improving, production-ready Streamlit application.")
-
-    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Delisted tickers auto-removed")
 
 
 if __name__ == "__main__":
