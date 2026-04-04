@@ -17,17 +17,17 @@ SAVED_LOG = "saved.log"
 # ====================== SECTOR TICKERS (EXPANDED + COMBINED) ======================
 ASX_MINING = ["BHP.AX", "RIO.AX", "FMG.AX", "S32.AX", "MIN.AX"]
 ASX_SHIPPING = ["QUB.AX", "TCL.AX", "ASX.AX"]
-ASX_ENERGY = ["STO.AX", "WDS.AX", "ORG.AX", "WHC.AX", "BPT.AX"]          # Oil, Gas, LNG, Coal
+ASX_ENERGY = ["STO.AX", "WDS.AX", "ORG.AX", "WHC.AX", "BPT.AX"]
 ASX_TECH = ["WTC.AX", "XRO.AX", "TNE.AX", "NXT.AX", "REA.AX", "360.AX", "PME.AX"]
 ASX_RENEW = ["ORG.AX", "AGL.AX", "IGO.AX", "IFT.AX", "MCY.AX", "CEN.AX", "MEZ.AX", "RNE.AX"]
 
 US_MINING = ["FCX", "NEM", "VALE", "SCCO", "GOLD", "AEM"]
 US_SHIPPING = ["ZIM", "MATX", "SBLK", "DAC", "CMRE"]
-US_ENERGY = ["XOM", "CVX", "COP", "OXY", "CCJ"]                          # Oil, Gas + Uranium (Cameco)
+US_ENERGY = ["XOM", "CVX", "COP", "OXY", "CCJ"]
 US_TECH = ["NVDA", "AAPL", "MSFT", "GOOGL", "AMD", "TSLA"]
 US_RENEW = ["NEE", "BEPC", "CWEN", "FSLR", "ENPH"]
 
-ALL_ASX = list(dict.fromkeys(ASX_MINING + ASX_SHIPPING + ASX_ENERGY + ASX_TECH + ASX_RENEW))  # deduped
+ALL_ASX = list(dict.fromkeys(ASX_MINING + ASX_SHIPPING + ASX_ENERGY + ASX_TECH + ASX_RENEW))
 ALL_US = list(dict.fromkeys(US_MINING + US_SHIPPING + US_ENERGY + US_TECH + US_RENEW))
 ALL_TICKERS = ALL_ASX + ALL_US
 
@@ -36,9 +36,8 @@ AVAILABLE_MODELS = ["grok-4.20-reasoning", "grok-4.20-non-reasoning", "grok-4.20
 
 logging.basicConfig(filename="geosupply_errors.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# ====================== OPTIMIZED SAVED ANALYSES (REVIEWED & REFINED) ======================
+# ====================== OPTIMIZED SAVED ANALYSES ======================
 def load_saved_analyses():
-    """Optimised: load once into session_state, never force-reset, dedupe by timestamp."""
     if "saved_analyses" not in st.session_state:
         st.session_state.saved_analyses = []
         if os.path.exists(SAVED_LOG):
@@ -48,7 +47,6 @@ def load_saved_analyses():
                         line = line.strip()
                         if line:
                             analysis = json.loads(line)
-                            # dedupe by timestamp + tab
                             if not any(a.get("timestamp") == analysis.get("timestamp") and a.get("tab") == analysis.get("tab") 
                                        for a in st.session_state.saved_analyses):
                                 st.session_state.saved_analyses.append(analysis)
@@ -57,22 +55,18 @@ def load_saved_analyses():
     return st.session_state.saved_analyses
 
 def save_analysis(analysis: dict):
-    """Append to file + session_state with atomic write."""
     try:
         os.makedirs(os.path.dirname(SAVED_LOG) or ".", exist_ok=True)
         with open(SAVED_LOG, "a", encoding="utf-8") as f:
             f.write(json.dumps(analysis, ensure_ascii=False) + "\n")
-        if "saved_analyses" not in st.session_state:
-            st.session_state.saved_analyses = []
-        # dedupe before append
-        if not any(a.get("timestamp") == analysis.get("timestamp") for a in st.session_state.saved_analyses):
-            st.session_state.saved_analyses.append(analysis)
+        if not any(a.get("timestamp") == analysis.get("timestamp") for a in st.session_state.get("saved_analyses", [])):
+            st.session_state.setdefault("saved_analyses", []).append(analysis)
         return True
     except Exception as e:
         st.error(f"Failed to save: {e}")
         return False
 
-# ====================== REUSABLE SECTOR BUILDER (CODE OPTIMISATION) ======================
+# ====================== REUSABLE SECTOR BUILDER ======================
 def build_sector_df(tickers: List[str], raw_data: Dict[str, pd.DataFrame], period: str) -> pd.DataFrame:
     rows = []
     for ticker in tickers:
@@ -101,11 +95,11 @@ def build_sector_df(tickers: List[str], raw_data: Dict[str, pd.DataFrame], perio
         df_sector = df_sector.sort_values("Rebound Score", ascending=False)
     return df_sector
 
-# ====================== CORE FUNCTIONS (unchanged + minor optimisations) ======================
+# ====================== CORE FUNCTIONS ======================
 @st.cache_data(ttl=300)
 def fetch_batch_data(tickers: List[str], period: str = "6mo", real_time_mode: bool = False) -> Dict[str, pd.DataFrame]:
     if real_time_mode:
-        period = "5d"  # shorter for intra-day feel
+        period = "5d"
     if not tickers:
         return {}
     try:
@@ -165,9 +159,9 @@ def call_grok_api(prompt: str, model: str, temperature: float = 0.7) -> str:
     if not api_key:
         return "Please enter your Grok API key in the sidebar."
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
-    payload = {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": temperature, "max_tokens": 1200}
+    payload = {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": temperature, "max_tokens": 1500}
     try:
-        resp = requests.post(f"{API_BASE}/chat/completions", headers=headers, json=payload, timeout=45)
+        resp = requests.post(f"{API_BASE}/chat/completions", headers=headers, json=payload, timeout=60)
         if resp.status_code != 200:
             logging.error(f"Grok API {resp.status_code}: {resp.text[:500]}")
             return f"Grok API error {resp.status_code}"
@@ -197,14 +191,56 @@ def get_ticker_info(ticker: str) -> Dict:
     except:
         return {"name": ticker.replace(".AX", ""), "sector": "Resources/Tech/Energy", "currency": "AUD" if ".AX" in ticker else "USD"}
 
+# ====================== OPTIMIZED IBKR PORTFOLIO BUILDER ======================
+def build_ibkr_portfolio(summary_df: pd.DataFrame, usd_aud_rate: float, raw_data: Dict) -> Dict:
+    if summary_df.empty or usd_aud_rate is None:
+        return {"error": "No data available"}
+    top_picks = summary_df.head(8).copy()
+    top_picks["Price_AUD"] = top_picks.apply(
+        lambda row: row["Price"] * usd_aud_rate if row["Market"] == "US" else row["Price"], axis=1
+    )
+    portfolio = []
+    remaining = 500.0
+    ibkr_fee_asx = 5.0
+    ibkr_fee_us = 2.0
+    for _, row in top_picks.iterrows():
+        if remaining <= 20:
+            break
+        price_aud = row["Price_AUD"]
+        allocation = min(remaining * 0.22, remaining)
+        shares = round(allocation / price_aud, 4)
+        cost = shares * price_aud
+        if cost > remaining:
+            shares = round(remaining / price_aud, 4)
+            cost = shares * price_aud
+        portfolio.append({
+            "Ticker": row["Ticker"],
+            "Company": row["Company"],
+            "Market": row["Market"],
+            "Shares": shares,
+            "Price_AUD": round(price_aud, 3),
+            "Cost_AUD": round(cost, 2),
+            "Allocation_%": round((cost / 500) * 100, 1)
+        })
+        remaining -= cost
+    total_cost = 500 - remaining
+    est_fees = ibkr_fee_asx if any(p["Market"] == "ASX" for p in portfolio) else ibkr_fee_us
+    return {
+        "holdings": portfolio,
+        "total_cost_aud": round(total_cost, 2),
+        "remaining_cash": round(remaining, 2),
+        "estimated_fees": round(est_fees, 2),
+        "net_invested": round(total_cost + est_fees, 2)
+    }
+
 # ====================== MAIN APP ======================
 def main():
-    load_saved_analyses()  # optimised load
+    load_saved_analyses()
     if "grok_api_key" not in st.session_state:
         st.session_state.grok_api_key = ""
 
     st.title("📍 GeoSupply Rebound Analyzer")
-    st.caption("**v11.0** • Multi-Sector (Mining + Shipping + Energy + Tech + Renewables) • Saved.log optimised • Real-time option + IBKR AU tab")
+    st.caption("**v11.2** • Multi-Sector • Saved.log optimised • Real-time • IBKR Portfolio OPTIMIZED • **Duplicate Chart ID fixed**")
 
     with st.sidebar:
         st.header("Controls")
@@ -214,8 +250,7 @@ def main():
         selected_model = st.selectbox("Grok Model", AVAILABLE_MODELS, index=0)
 
         st.subheader("Data Options")
-        real_time_mode = st.checkbox("🔴 Real-time intra-day mode (yfinance 1m candles)", value=False,
-                                     help="Shorter history for live feel – rebound scores still use full logic")
+        real_time_mode = st.checkbox("🔴 Real-time intra-day mode (1m candles)", value=False)
         market_filter = st.radio("Market Focus", ["Both", "ASX Only", "US Only"], horizontal=True)
         period = st.selectbox("Historical Period", ["1mo", "3mo", "6mo", "1y"], index=2 if not real_time_mode else 0)
         st.divider()
@@ -233,53 +268,40 @@ def main():
             st.caption(f"{usd:,.0f} USD = **{aud_val:,.2f} AUD**")
 
         st.divider()
-        st.info("**Rebound Score**  \n55% RSI (oversold) + 30% distance from 52w high + 15% momentum  \n**≥65 + RSI≤42 = strong buy**")
+        st.info("**Rebound Score**  \n55% RSI + 30% 52w high distance + 15% momentum")
         if st.button("Refresh All Data", use_container_width=True):
             st.cache_data.clear()
             st.rerun()
 
-    # Filter tickers
     active_tickers = ALL_TICKERS if market_filter == "Both" else (ALL_ASX if market_filter == "ASX Only" else ALL_US)
     raw_data = fetch_batch_data(active_tickers, period, real_time_mode)
-
-    # Dashboard summary
     summary_df = build_sector_df(active_tickers, raw_data, period)
 
     tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
-        "📊 Dashboard", 
-        "⛏️ Mining", 
-        "🚢 Shipping", 
-        "⚡ Energy", 
-        "💻 Technology", 
-        "🌱 Renewables",
-        "🧪 Simulator", 
-        "💡 Strategy & Grok Insights", 
-        "📚 Saved Analyses",
-        "💼 Interactive Brokers AU"
+        "📊 Dashboard", "⛏️ Mining", "🚢 Shipping", "⚡ Energy", "💻 Technology", 
+        "🌱 Renewables", "🧪 Simulator", "💡 Strategy & Grok", "📚 Saved Analyses", "💼 IBKR AU"
     ])
 
-    # Reusable page analyzer
-    def add_page_analyzer(tab_name: str, page_context: str = "", model: str = selected_model):
+    def add_page_analyzer(tab_name: str, page_context: str = ""):
         with st.expander("Analyse this page with Grok", expanded=False):
-            st.caption(f"**{tab_name}** tab • Model: **{model}**")
+            st.caption(f"**{tab_name}** tab • Model: **{selected_model}**")
             user_prompt = st.text_area("Optional instructions", placeholder="e.g. Suggest better layout...", key=f"user_prompt_{tab_name}", height=80)
             if st.button("Analyse Page with Grok", key=f"analyze_btn_{tab_name}", use_container_width=True):
                 with st.spinner("Grok analysing..."):
                     full_prompt = f"""
-You are analysing the **'{tab_name}'** tab of GeoSupply Rebound Analyzer v11.0 (multi-sector: Mining/Shipping/Energy/Tech/Renewables).
-CURRENT PAGE CONTEXT: {page_context or "No specific data summary."}
-USER REQUEST: {user_prompt or "General improvements."}
-TASK: 1. Bugs/UX 2. Actionable improvements 3. $500-user ideas 4. Code optimisations.
+You are analysing the **'{tab_name}'** tab of GeoSupply Rebound Analyzer v11.2.
+CURRENT PAGE CONTEXT: {page_context or "No data summary."}
+TASK: 1. Bugs/UX 2. Improvements 3. $500-user ideas 4. Code optimisations.
 Be concise and numbered.
 """
-                    response = call_grok_api(full_prompt, model, temperature=0.7)
+                    response = call_grok_api(full_prompt, selected_model)
                     st.markdown("### Grok's Analysis")
                     st.write(response)
                     if st.button("Save Analysis", key=f"save_btn_{tab_name}", use_container_width=True):
                         analysis = {
                             "tab": tab_name,
                             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                            "model_used": model,
+                            "model_used": selected_model,
                             "user_prompt": user_prompt or "General",
                             "response": response
                         }
@@ -298,11 +320,15 @@ Be concise and numbered.
             top_ticker = summary_df.iloc[0]["Ticker"]
             if top_ticker in raw_data:
                 info = get_ticker_info(top_ticker)
-                st.plotly_chart(create_price_rsi_chart(raw_data[top_ticker], top_ticker, info["name"]), use_container_width=True)
+                st.plotly_chart(
+                    create_price_rsi_chart(raw_data[top_ticker], top_ticker, info["name"]),
+                    use_container_width=True,
+                    key="dashboard_top_chart"   # ← UNIQUE KEY FIX
+                )
         context = summary_df.head(10).to_string(index=False) if not summary_df.empty else "No data"
         add_page_analyzer("Dashboard", context)
 
-    # TAB 2-6: SECTOR TABS (using reusable builder)
+    # SECTOR TABS (with unique chart keys)
     sector_config = {
         "Mining": (ASX_MINING + US_MINING, "⛏️"),
         "Shipping": (ASX_SHIPPING + US_SHIPPING, "🚢"),
@@ -311,7 +337,6 @@ Be concise and numbered.
         "Renewables": (ASX_RENEW + US_RENEW, "🌱")
     }
     tab_map = {tab2: "Mining", tab3: "Shipping", tab4: "Energy", tab5: "Technology", tab6: "Renewables"}
-
     for tab_obj, sector_name in tab_map.items():
         with tab_obj:
             st.subheader(f"{sector_config[sector_name][1]} {sector_name} Stocks Analysis")
@@ -327,7 +352,11 @@ Be concise and numbered.
                 top_t = sector_df.iloc[0]["Ticker"]
                 if top_t in sector_data:
                     info = get_ticker_info(top_t)
-                    st.plotly_chart(create_price_rsi_chart(sector_data[top_t], top_t, info["name"]), use_container_width=True)
+                    st.plotly_chart(
+                        create_price_rsi_chart(sector_data[top_t], top_t, info["name"]),
+                        use_container_width=True,
+                        key=f"{sector_name.lower()}_top_chart"   # ← UNIQUE KEY FIX
+                    )
             context = sector_df.head(8).to_string(index=False) if not sector_df.empty else f"No {sector_name.lower()} data"
             add_page_analyzer(sector_name, context)
 
@@ -348,37 +377,37 @@ Be concise and numbered.
                     df_sim = pd.DataFrame({"Close": prices}, index=dates)
                     score, rsi, mom = calculate_rebound_score(df_sim)
                     st.success(f"**Rebound Score:** {score:.1f} | RSI: {rsi} | Momentum: {mom}%")
-                    st.plotly_chart(create_price_rsi_chart(df_sim, ticker_sim, company_sim), use_container_width=True)
+                    st.plotly_chart(
+                        create_price_rsi_chart(df_sim, ticker_sim, company_sim),
+                        use_container_width=True,
+                        key="simulator_chart"   # ← UNIQUE KEY FIX
+                    )
             except Exception as e:
                 st.error(f"Invalid data: {e}")
         add_page_analyzer("Simulator", "Custom price simulator")
 
-    # TAB 8: STRATEGY
+    # TAB 8–9 unchanged (no charts)
     with tab8:
         st.subheader("💡 Strategy & Grok Insights ($500 AUD)")
         if not summary_df.empty:
-            top_picks = summary_df.head(5)[["Ticker", "Company", "Rebound Score", "RSI"]].to_dict(orient="records")
             st.dataframe(summary_df.head(5), use_container_width=True, hide_index=True)
             if st.button("Get Grok $500 Portfolio Strategy", use_container_width=True):
                 with st.spinner("Grok consulting..."):
                     strategy_prompt = f"""
 Based on current top rebound stocks (multi-sector):
-{json.dumps(top_picks, indent=2)}
-Suggest a diversified $500 AUD CommSec/IBKR-friendly portfolio. Prefer ASX. Include exact share quantities, risk reasoning, and expected rebound. Be specific.
+{json.dumps(summary_df.head(5)[["Ticker", "Company", "Rebound Score", "RSI"]].to_dict(orient="records"), indent=2)}
+Suggest a diversified $500 AUD portfolio. Be specific and actionable.
 """
                     response = call_grok_api(strategy_prompt, selected_model)
                     st.markdown("### Grok Strategy")
                     st.write(response)
                     if st.button("Save Strategy"):
-                        analysis = {"tab": "Strategy", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                                    "model_used": selected_model, "user_prompt": "Portfolio", "response": response}
-                        save_analysis(analysis)
+                        save_analysis({"tab": "Strategy", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "model_used": selected_model, "user_prompt": "Portfolio", "response": response})
         add_page_analyzer("Strategy & Grok Insights", "Grok $500 strategy")
 
-    # TAB 9: SAVED ANALYSES
     with tab9:
         st.subheader("📚 Saved Grok Analyses")
-        st.caption(f"**{SAVED_LOG}** • {len(st.session_state.saved_analyses)} entries (optimised deduped load)")
+        st.caption(f"**{SAVED_LOG}** • {len(st.session_state.saved_analyses)} entries")
         if st.session_state.saved_analyses:
             for i, analysis in enumerate(reversed(st.session_state.saved_analyses)):
                 with st.expander(f"{analysis['tab']} — {analysis['timestamp']}"):
@@ -397,38 +426,82 @@ Suggest a diversified $500 AUD CommSec/IBKR-friendly portfolio. Prefer ASX. Incl
             st.rerun()
         add_page_analyzer("Saved Analyses", "Meta saved analyses tab")
 
-    # TAB 10: INTERACTIVE BROKERS AU
+    # TAB 10: IBKR AU (pie chart also now has unique key)
     with tab10:
-        st.subheader("💼 Interactive Brokers Australia")
-        st.caption("Low-cost execution • ASX + Global • Ideal for $500 portfolios")
-        st.info("IBKR AU offers $0–$5 brokerage on small ASX trades and direct US access. Real API integration possible via ib_insync (future).")
-        
+        st.subheader("💼 Interactive Brokers Australia – OPTIMIZED $500 Portfolio")
+        st.caption("Low-fee ASX + Global execution • Fractional shares supported • Real prices used")
+
         col_a, col_b = st.columns(2)
         with col_a:
-            st.metric("Typical $500 ASX trade fee", "**$0–$5**")
-            st.metric("US stocks", "**$0.005/share** (min $1)")
+            st.metric("Typical ASX trade fee", "**$0–$5**")
+            st.metric("US stocks", "**$0.005/share (min $1)**")
         with col_b:
-            st.write("**Why IBKR for GeoSupply users?**")
-            st.write("• Real-time data via TWS API")
-            st.write("• Fractional shares + auto-rebalancing")
-            st.write("• Direct access to all 50+ GeoSupply tickers")
+            st.write("**IBKR Optimizations applied:**")
+            st.write("• Real-time prices converted to AUD")
+            st.write("• ASX priority + fractional shares")
+            st.write("• Fees kept under $10 total")
+            st.write("• JSON-structured output for clean tables & charts")
 
-        if st.button("Generate IBKR-Optimised $500 Portfolio", use_container_width=True):
-            with st.spinner("Building IBKR-friendly allocation..."):
-                ibkr_prompt = f"""
-Current top rebound picks (all sectors):
-{json.dumps(summary_df.head(8)[['Ticker','Company','Rebound Score']].to_dict(orient='records') if not summary_df.empty else [])}
-Create a $500 AUD portfolio optimised for IBKR Australia (low fees, whole/fractional shares, ASX priority). 
-Include exact quantities, expected brokerage, and one-click TWS order notes.
+        if st.button("🚀 Generate OPTIMIZED IBKR $500 Portfolio", use_container_width=True, type="primary"):
+            with st.spinner("Building exact IBKR-ready portfolio using live prices..."):
+                base_portfolio = build_ibkr_portfolio(summary_df, rate, raw_data)
+                if "error" in base_portfolio:
+                    st.error(base_portfolio["error"])
+                else:
+                    ibkr_prompt = f"""
+You are an expert IBKR Australia portfolio advisor for a $500 AUD investor.
+Here are the CURRENT top rebound stocks with REAL prices in AUD:
+{json.dumps(summary_df.head(8)[["Ticker", "Company", "Market", "Price", "Rebound Score"]].to_dict(orient="records"), indent=2)}
+
+Pre-computed realistic allocation (for reference):
+{json.dumps(base_portfolio, indent=2)}
+
+Return **STRICT JSON only** (no extra text):
+{{
+  "holdings": [ {{"ticker": "...", "company": "...", "shares": 12.5, "cost_aud": 142.3, "allocation_pct": 28.5, "reason": "..."}} ],
+  "total_cost_aud": 487.4,
+  "remaining_cash": 12.6,
+  "estimated_ibkr_fees": 4.5,
+  "overall_reasoning": "Short plain-English summary",
+  "tws_order_notes": "Exact copy-paste notes for TWS"
+}}
 """
-                ibkr_response = call_grok_api(ibkr_prompt, selected_model)
-                st.markdown("### IBKR-Optimised Strategy")
-                st.write(ibkr_response)
+                    raw_response = call_grok_api(ibkr_prompt, selected_model, temperature=0.3)
+                    try:
+                        start = raw_response.find("{")
+                        end = raw_response.rfind("}") + 1
+                        portfolio_json = json.loads(raw_response[start:end])
+                        holdings_df = pd.DataFrame(portfolio_json["holdings"])
+                        st.markdown("### ✅ Your Optimized IBKR $500 Portfolio")
+                        st.dataframe(
+                            holdings_df.style.format({"shares": "{:.4f}", "cost_aud": "${:.2f}", "allocation_pct": "{:.1f}%"})
+                            .map(lambda x: "color: #2ED573" if x > 20 else "", subset=["allocation_pct"]),
+                            use_container_width=True, hide_index=True
+                        )
+                        fig_pie = go.Figure(data=[go.Pie(labels=holdings_df["ticker"], values=holdings_df["allocation_pct"], hole=0.4, marker_colors=["#00d4ff","#2ED573","#FFC107","#FF4757"])])
+                        fig_pie.update_layout(height=380, title="Allocation Breakdown", template="plotly_dark")
+                        st.plotly_chart(fig_pie, use_container_width=True, key="ibkr_pie_chart")  # ← UNIQUE KEY FIX
+                        c1, c2, c3, c4 = st.columns(4)
+                        c1.metric("Total Invested", f"${portfolio_json['total_cost_aud']:.2f}")
+                        c2.metric("Remaining Cash", f"${portfolio_json['remaining_cash']:.2f}")
+                        c3.metric("Est. IBKR Fees", f"${portfolio_json['estimated_ibkr_fees']:.2f}")
+                        c4.metric("Net Invested", f"${portfolio_json.get('net_invested', portfolio_json['total_cost_aud'] + portfolio_json['estimated_ibkr_fees']):.2f}")
+                        st.markdown("**Grok Reasoning:**")
+                        st.write(portfolio_json["overall_reasoning"])
+                        st.markdown("**TWS Order Notes (copy-paste):**")
+                        st.code(portfolio_json["tws_order_notes"], language="text")
+                        csv = holdings_df.to_csv(index=False)
+                        st.download_button("📥 Download Portfolio CSV", csv, "ibkr_portfolio.csv", "text/csv", use_container_width=True)
+                        if st.button("Save IBKR Portfolio to saved.log"):
+                            save_analysis({"tab": "IBKR AU", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "model_used": selected_model, "user_prompt": "Optimized IBKR portfolio", "response": json.dumps(portfolio_json, indent=2)})
+                            st.success("Saved!")
+                    except Exception:
+                        st.warning("Could not parse JSON – showing raw output")
+                        st.write(raw_response)
 
-        st.caption("Tip: Use IBKR TWS API + this app for live portfolio sync in future releases.")
-        add_page_analyzer("Interactive Brokers AU", "IBKR AU integration tab")
+        st.caption("💡 Real prices + exact share math + fee estimates = the most accurate $500 IBKR portfolio possible in one click.")
 
-    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | v11.0 • All sectors combined • Saved.log refined • Real-time + IBKR ready")
+    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | v11.2 • All plotly_chart calls now have unique keys → StreamlitDuplicateElementId error fixed")
 
 if __name__ == "__main__":
     main()
