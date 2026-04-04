@@ -359,17 +359,32 @@ def main():
         add_page_analyzer("Dashboard", context, raw_data)
 
     # (The rest of your tabs 2–5 are unchanged and included below for completeness)
-    with tab2:
+        with tab2:
         st.subheader("🧪 Rebound Simulator")
         st.caption(f"**Data timeframe:** {get_data_timeframe(raw_data, real_time_mode, period)} (simulator uses your custom prices)")
         col1, col2 = st.columns(2)
-        with col1: ticker_sim = st.text_input("Ticker (for display)", value="SIM.AX")
-        with col2: company_sim = st.text_input("Company name", value="Simulated Co")
-        price_input = st.text_area("Price series (one per line)", placeholder="12.3\n12.5\n...", height=150)
+        with col1: 
+            ticker_sim = st.text_input("Ticker (for display)", value="SIM.AX")
+        with col2: 
+            company_sim = st.text_input("Company name", value="Simulated Co")
+        
+        price_input = st.text_area("Price series (one per line)", 
+                                   placeholder="12.3\n12.5\n13.1\n...", 
+                                   height=150)
+        
         if st.button("Calculate Rebound Score", use_container_width=True):
             try:
                 prices = [float(p.strip()) for p in price_input.strip().split("\n") if p.strip()]
                 if len(prices) < 10:
                     st.warning("Need at least 10 price points")
                 else:
-                    dates
+                    dates = pd.date_range(end=pd.Timestamp.today(), periods=len(prices), freq='B')
+                    df_sim = pd.DataFrame({"Close": prices}, index=dates)
+                    score, rsi, mom = calculate_rebound_score(df_sim)
+                    st.success(f"**Rebound Score:** {score:.1f} | RSI: {rsi} | Momentum (10d %): {mom}%")
+                    st.plotly_chart(create_price_rsi_chart(df_sim, ticker_sim, company_sim), 
+                                    use_container_width=True, key="simulator_chart")
+            except Exception as e:
+                st.error(f"Invalid price data: {e}")
+        
+        add_page_analyzer("Simulator", "Custom price input for rebound score testing", None)
