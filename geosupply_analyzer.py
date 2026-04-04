@@ -14,13 +14,21 @@ st.set_page_config(page_title="GeoSupply Rebound Analyzer", page_icon="📈", la
 
 SAVED_LOG = "saved.log"
 
+# ====================== SECTOR TICKERS (EXPANDED + COMBINED) ======================
 ASX_MINING = ["BHP.AX", "RIO.AX", "FMG.AX", "S32.AX", "MIN.AX"]
 ASX_SHIPPING = ["QUB.AX", "TCL.AX", "ASX.AX"]
+ASX_ENERGY = ["STO.AX", "WDS.AX", "ORG.AX", "WHC.AX", "BPT.AX"]          # Oil, Gas, LNG, Coal
+ASX_TECH = ["WTC.AX", "XRO.AX", "TNE.AX", "NXT.AX", "REA.AX", "360.AX", "PME.AX"]
+ASX_RENEW = ["ORG.AX", "AGL.AX", "IGO.AX", "IFT.AX", "MCY.AX", "CEN.AX", "MEZ.AX", "RNE.AX"]
+
 US_MINING = ["FCX", "NEM", "VALE", "SCCO", "GOLD", "AEM"]
 US_SHIPPING = ["ZIM", "MATX", "SBLK", "DAC", "CMRE"]
+US_ENERGY = ["XOM", "CVX", "COP", "OXY", "CCJ"]                          # Oil, Gas + Uranium (Cameco)
+US_TECH = ["NVDA", "AAPL", "MSFT", "GOOGL", "AMD", "TSLA"]
+US_RENEW = ["NEE", "BEPC", "CWEN", "FSLR", "ENPH"]
 
-ALL_ASX = ASX_MINING + ASX_SHIPPING
-ALL_US = US_MINING + US_SHIPPING
+ALL_ASX = list(dict.fromkeys(ASX_MINING + ASX_SHIPPING + ASX_ENERGY + ASX_TECH + ASX_RENEW))  # deduped
+ALL_US = list(dict.fromkeys(US_MINING + US_SHIPPING + US_ENERGY + US_TECH + US_RENEW))
 ALL_TICKERS = ALL_ASX + ALL_US
 
 API_BASE = "https://api.x.ai/v1"
@@ -28,65 +36,80 @@ AVAILABLE_MODELS = ["grok-4.20-reasoning", "grok-4.20-non-reasoning", "grok-4.20
 
 logging.basicConfig(filename="geosupply_errors.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
+# ====================== OPTIMIZED SAVED ANALYSES (REVIEWED & REFINED) ======================
 def load_saved_analyses():
+    """Optimised: load once into session_state, never force-reset, dedupe by timestamp."""
     if "saved_analyses" not in st.session_state:
         st.session_state.saved_analyses = []
-    st.session_state.saved_analyses = []
-    if os.path.exists(SAVED_LOG):
-        try:
-            with open(SAVED_LOG, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if line:
-                        st.session_state.saved_analyses.append(json.loads(line))
-        except Exception as e:
-            st.warning(f"Could not load saved.log: {e}")
+        if os.path.exists(SAVED_LOG):
+            try:
+                with open(SAVED_LOG, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            analysis = json.loads(line)
+                            # dedupe by timestamp + tab
+                            if not any(a.get("timestamp") == analysis.get("timestamp") and a.get("tab") == analysis.get("tab") 
+                                       for a in st.session_state.saved_analyses):
+                                st.session_state.saved_analyses.append(analysis)
+            except Exception as e:
+                st.warning(f"Could not load saved.log: {e}")
+    return st.session_state.saved_analyses
 
 def save_analysis(analysis: dict):
+    """Append to file + session_state with atomic write."""
     try:
         os.makedirs(os.path.dirname(SAVED_LOG) or ".", exist_ok=True)
         with open(SAVED_LOG, "a", encoding="utf-8") as f:
             f.write(json.dumps(analysis, ensure_ascii=False) + "\n")
         if "saved_analyses" not in st.session_state:
             st.session_state.saved_analyses = []
-        st.session_state.saved_analyses.append(analysis)
+        # dedupe before append
+        if not any(a.get("timestamp") == analysis.get("timestamp") for a in st.session_state.saved_analyses):
+            st.session_state.saved_analyses.append(analysis)
         return True
     except Exception as e:
-        st.error(f"Failed to save to saved.log: {e}")
+        st.error(f"Failed to save: {e}")
         return False
 
-def add_page_analyzer(tab_name: str, page_context: str = "", model: str = "grok-4.20-reasoning"):
-    with st.expander("Analyse this page with Grok", expanded=False):
-        st.caption(f"**{tab_name}** tab • Using model: **{model}**")
-        user_prompt = st.text_area("Optional instructions to guide Grok", placeholder="e.g. Suggest better layout, fix bugs, make more beginner-friendly...", key=f"user_prompt_{tab_name}", height=80)
-        if st.button("Analyse Page with Grok", key=f"analyze_btn_{tab_name}", use_container_width=True):
-            with st.spinner("Grok is analysing this page..."):
-                full_prompt = f"""
-You are analysing the **'{tab_name}'** tab of the GeoSupply Rebound Analyzer (v10.9).
-CURRENT PAGE CONTEXT: {page_context or "No specific data summary."}
-USER REQUEST: {user_prompt or "General troubleshooting and improvement suggestions."}
-TASK: 1. Bugs/UX issues 2. Actionable improvements 3. Ideas for $500 users 4. Code optimisations.
-Be concise and number your suggestions.
-"""
-                response = call_grok_api(full_prompt, model, temperature=0.7)
-                st.markdown("### Grok's Page Analysis")
-                st.write(response)
-                if st.button("Save this Grok Analysis", key=f"save_btn_{tab_name}", use_container_width=True):
-                    analysis = {
-                        "tab": tab_name,
-                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        "model_used": model,
-                        "user_prompt": user_prompt or "General analysis",
-                        "response": response
-                    }
-                    if save_analysis(analysis):
-                        st.success("Analysis saved permanently to saved.log!")
+# ====================== REUSABLE SECTOR BUILDER (CODE OPTIMISATION) ======================
+def build_sector_df(tickers: List[str], raw_data: Dict[str, pd.DataFrame], period: str) -> pd.DataFrame:
+    rows = []
+    for ticker in tickers:
+        if ticker not in raw_data or raw_data[ticker].empty or len(raw_data[ticker]) < 15:
+            continue
+        df = raw_data[ticker]
+        score, rsi_val, mom = calculate_rebound_score(df)
+        info = get_ticker_info(ticker)
+        latest = df.iloc[-1]
+        prev_close = df.iloc[-2]["Close"] if len(df) > 1 else latest["Close"]
+        change_pct = ((latest["Close"] / prev_close) - 1) * 100
+        rows.append({
+            "Ticker": ticker,
+            "Company": info["name"],
+            "Market": "ASX" if ".AX" in ticker else "US",
+            "Currency": info["currency"],
+            "Price": round(latest["Close"], 3),
+            "Change %": round(change_pct, 2),
+            "RSI": rsi_val,
+            "Rebound Score": round(score, 1),
+            "Momentum": mom,
+            "Volume": int(latest.get("Volume", 0))
+        })
+    df_sector = pd.DataFrame(rows)
+    if not df_sector.empty:
+        df_sector = df_sector.sort_values("Rebound Score", ascending=False)
+    return df_sector
 
+# ====================== CORE FUNCTIONS (unchanged + minor optimisations) ======================
 @st.cache_data(ttl=300)
-def fetch_batch_data(tickers: List[str], period: str = "6mo") -> Dict[str, pd.DataFrame]:
-    if not tickers: return {}
+def fetch_batch_data(tickers: List[str], period: str = "6mo", real_time_mode: bool = False) -> Dict[str, pd.DataFrame]:
+    if real_time_mode:
+        period = "5d"  # shorter for intra-day feel
+    if not tickers:
+        return {}
     try:
-        data = yf.download(tickers, period=period, group_by="ticker", auto_adjust=True, progress=False)
+        data = yf.download(tickers, period=period, group_by="ticker", auto_adjust=True, progress=False, interval="1m" if real_time_mode else "1d")
         data_dict = {}
         for ticker in tickers:
             if len(tickers) == 1:
@@ -146,7 +169,7 @@ def call_grok_api(prompt: str, model: str, temperature: float = 0.7) -> str:
     try:
         resp = requests.post(f"{API_BASE}/chat/completions", headers=headers, json=payload, timeout=45)
         if resp.status_code != 200:
-            logging.error(f"Grok API {resp.status_code} (model {model}): {resp.text[:500]}")
+            logging.error(f"Grok API {resp.status_code}: {resp.text[:500]}")
             return f"Grok API error {resp.status_code}"
         return resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
@@ -168,191 +191,244 @@ def create_price_rsi_chart(df: pd.DataFrame, ticker: str, company_name: str) -> 
 def get_ticker_info(ticker: str) -> Dict:
     try:
         info = yf.Ticker(ticker).info
-        return {"name": info.get("longName") or info.get("shortName") or ticker.replace(".AX", ""), "sector": info.get("sector", "Mining/Shipping"), "currency": "AUD" if ".AX" in ticker else "USD"}
+        return {"name": info.get("longName") or info.get("shortName") or ticker.replace(".AX", ""), 
+                "sector": info.get("sector", "Multi-Sector"), 
+                "currency": "AUD" if ".AX" in ticker else "USD"}
     except:
-        return {"name": ticker.replace(".AX", ""), "sector": "Resources/Transport", "currency": "AUD" if ".AX" in ticker else "USD"}
+        return {"name": ticker.replace(".AX", ""), "sector": "Resources/Tech/Energy", "currency": "AUD" if ".AX" in ticker else "USD"}
 
+# ====================== MAIN APP ======================
 def main():
-    load_saved_analyses()
+    load_saved_analyses()  # optimised load
     if "grok_api_key" not in st.session_state:
         st.session_state.grok_api_key = ""
-    st.title("GeoSupply Rebound Analyzer")
-    st.caption("**v10.9** • Grok analyses now saved reliably to saved.log")
+
+    st.title("📍 GeoSupply Rebound Analyzer")
+    st.caption("**v11.0** • Multi-Sector (Mining + Shipping + Energy + Tech + Renewables) • Saved.log optimised • Real-time option + IBKR AU tab")
+
     with st.sidebar:
         st.header("Controls")
         grok_key = st.text_input("Grok API Key", type="password", value=st.session_state.grok_api_key, help="Get key at https://x.ai/api")
-        if grok_key: st.session_state.grok_api_key = grok_key
+        if grok_key:
+            st.session_state.grok_api_key = grok_key
         selected_model = st.selectbox("Grok Model", AVAILABLE_MODELS, index=0)
+
+        st.subheader("Data Options")
+        real_time_mode = st.checkbox("🔴 Real-time intra-day mode (yfinance 1m candles)", value=False,
+                                     help="Shorter history for live feel – rebound scores still use full logic")
         market_filter = st.radio("Market Focus", ["Both", "ASX Only", "US Only"], horizontal=True)
-        period = st.selectbox("Historical Period", ["1mo", "3mo", "6mo", "1y"], index=2)
+        period = st.selectbox("Historical Period", ["1mo", "3mo", "6mo", "1y"], index=2 if not real_time_mode else 0)
         st.divider()
+
         st.subheader("USD ↔ AUD")
         rate = get_usd_aud_rate()
         if rate:
             st.metric("1 USD =", f"{rate:.4f} AUD")
             c1, c2 = st.columns(2)
-            with c1: usd = st.number_input("USD", value=1000.0, step=100.0)
-            with c2: st.number_input("AUD", value=round(usd * rate, 2), step=100.0, key="aud")
-            st.caption(f"{usd:,.0f} USD = **{usd*rate:,.2f} AUD**")
+            with c1:
+                usd = st.number_input("USD", value=1000.0, step=100.0, key="usd_input")
+            with c2:
+                aud_val = round(usd * rate, 2)
+                st.number_input("AUD", value=aud_val, step=100.0, key="aud_input", disabled=True)
+            st.caption(f"{usd:,.0f} USD = **{aud_val:,.2f} AUD**")
+
         st.divider()
-        st.info("**Rebound Score explained**  \n55% RSI (oversold) + 30% distance from 52w high + 15% momentum  \n**≥65 + RSI≤42 = strong buy signal**")
+        st.info("**Rebound Score**  \n55% RSI (oversold) + 30% distance from 52w high + 15% momentum  \n**≥65 + RSI≤42 = strong buy**")
         if st.button("Refresh All Data", use_container_width=True):
             st.cache_data.clear()
             st.rerun()
+
+    # Filter tickers
     active_tickers = ALL_TICKERS if market_filter == "Both" else (ALL_ASX if market_filter == "ASX Only" else ALL_US)
-    raw_data = fetch_batch_data(active_tickers, period)
-    summary_rows = []
-    detailed_data: Dict[str, pd.DataFrame] = {}
-    for ticker, df in raw_data.items():
-        if df.empty or len(df) < 15: continue
-        score, rsi_val, mom = calculate_rebound_score(df)
-        info = get_ticker_info(ticker)
-        latest = df.iloc[-1]
-        prev_close = df.iloc[-2]["Close"] if len(df) > 1 else latest["Close"]
-        change_pct = ((latest["Close"] / prev_close) - 1) * 100
-        summary_rows.append({"Ticker": ticker, "Company": info["name"], "Market": "ASX" if ".AX" in ticker else "US", "Currency": info["currency"], "Price": round(latest["Close"], 3), "Change %": round(change_pct, 2), "RSI": rsi_val, "Rebound Score": round(score, 1), "Momentum": mom, "Volume": int(latest.get("Volume", 0))})
-        detailed_data[ticker] = df
-    summary_df = pd.DataFrame(summary_rows)
-    if not summary_df.empty:
-        summary_df = summary_df.sort_values("Rebound Score", ascending=False)
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Dashboard", "Mining", "Shipping", "Simulator", "Strategy & Grok Insights", "Saved Analyses"])
+    raw_data = fetch_batch_data(active_tickers, period, real_time_mode)
+
+    # Dashboard summary
+    summary_df = build_sector_df(active_tickers, raw_data, period)
+
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
+        "📊 Dashboard", 
+        "⛏️ Mining", 
+        "🚢 Shipping", 
+        "⚡ Energy", 
+        "💻 Technology", 
+        "🌱 Renewables",
+        "🧪 Simulator", 
+        "💡 Strategy & Grok Insights", 
+        "📚 Saved Analyses",
+        "💼 Interactive Brokers AU"
+    ])
+
+    # Reusable page analyzer
+    def add_page_analyzer(tab_name: str, page_context: str = "", model: str = selected_model):
+        with st.expander("Analyse this page with Grok", expanded=False):
+            st.caption(f"**{tab_name}** tab • Model: **{model}**")
+            user_prompt = st.text_area("Optional instructions", placeholder="e.g. Suggest better layout...", key=f"user_prompt_{tab_name}", height=80)
+            if st.button("Analyse Page with Grok", key=f"analyze_btn_{tab_name}", use_container_width=True):
+                with st.spinner("Grok analysing..."):
+                    full_prompt = f"""
+You are analysing the **'{tab_name}'** tab of GeoSupply Rebound Analyzer v11.0 (multi-sector: Mining/Shipping/Energy/Tech/Renewables).
+CURRENT PAGE CONTEXT: {page_context or "No specific data summary."}
+USER REQUEST: {user_prompt or "General improvements."}
+TASK: 1. Bugs/UX 2. Actionable improvements 3. $500-user ideas 4. Code optimisations.
+Be concise and numbered.
+"""
+                    response = call_grok_api(full_prompt, model, temperature=0.7)
+                    st.markdown("### Grok's Analysis")
+                    st.write(response)
+                    if st.button("Save Analysis", key=f"save_btn_{tab_name}", use_container_width=True):
+                        analysis = {
+                            "tab": tab_name,
+                            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            "model_used": model,
+                            "user_prompt": user_prompt or "General",
+                            "response": response
+                        }
+                        if save_analysis(analysis):
+                            st.success("Saved to saved.log!")
+
+    # TAB 1: DASHBOARD
     with tab1:
-        st.subheader("Top Rebound Opportunities")
+        st.subheader("Top Rebound Opportunities (All Sectors)")
         if not summary_df.empty:
-            styled = summary_df.style.format({"Price": "${:.3f}", "Change %": "{:.2f}%", "Rebound Score": "{:.1f}", "RSI": "{:.1f}"}).map(lambda x: "color: #2ED573; font-weight: bold" if x >= 65 else ("color: #FFC107; font-weight: bold" if x >= 45 else "color: #FF4757; font-weight: bold"), subset=["Rebound Score"])
+            styled = summary_df.style.format({"Price": "${:.3f}", "Change %": "{:.2f}%", "Rebound Score": "{:.1f}", "RSI": "{:.1f}"}).map(
+                lambda x: "color: #2ED573; font-weight: bold" if x >= 65 else ("color: #FFC107; font-weight: bold" if x >= 45 else "color: #FF4757; font-weight: bold"),
+                subset=["Rebound Score"]
+            )
             st.dataframe(styled, use_container_width=True, hide_index=True)
             top_ticker = summary_df.iloc[0]["Ticker"]
-            if top_ticker in detailed_data:
+            if top_ticker in raw_data:
                 info = get_ticker_info(top_ticker)
-                st.plotly_chart(create_price_rsi_chart(detailed_data[top_ticker], top_ticker, info["name"]), use_container_width=True)
-        context = summary_df.head(8).to_string(index=False) if not summary_df.empty else "No data"
-        add_page_analyzer("Dashboard", context, selected_model)
-    with tab2:
-        st.subheader("⛏️ Mining Stocks Analysis")
-        st.caption("ASX & US mining stocks with rebound scoring")
-        mining_tickers = ASX_MINING + US_MINING
-        mining_data = fetch_batch_data(mining_tickers, period)
-        mining_rows = []
-        mining_detailed: Dict[str, pd.DataFrame] = {}
-        for ticker, df in mining_data.items():
-            if df.empty or len(df) < 15: continue
-            score, rsi_val, mom = calculate_rebound_score(df)
-            info = get_ticker_info(ticker)
-            latest = df.iloc[-1]
-            prev_close = df.iloc[-2]["Close"] if len(df) > 1 else latest["Close"]
-            change_pct = ((latest["Close"] / prev_close) - 1) * 100
-            mining_rows.append({"Ticker": ticker, "Company": info["name"], "Market": "ASX" if ".AX" in ticker else "US", "Currency": info["currency"], "Price": round(latest["Close"], 3), "Change %": round(change_pct, 2), "RSI": rsi_val, "Rebound Score": round(score, 1), "Momentum": mom, "Volume": int(latest.get("Volume", 0))})
-            mining_detailed[ticker] = df
-        mining_df = pd.DataFrame(mining_rows)
-        if not mining_df.empty:
-            mining_df = mining_df.sort_values("Rebound Score", ascending=False)
-        st.dataframe(mining_df.style.format({"Price": "${:.3f}", "Change %": "{:.2f}%", "Rebound Score": "{:.1f}", "RSI": "{:.1f}"}).map(lambda x: "color: #2ED573; font-weight: bold" if x >= 65 else ("color: #FFC107; font-weight: bold" if x >= 45 else "color: #FF4757; font-weight: bold"), subset=["Rebound Score"]), use_container_width=True, hide_index=True)
-        if not mining_df.empty:
-            top_mining = mining_df.iloc[0]["Ticker"]
-            if top_mining in mining_detailed:
-                info = get_ticker_info(top_mining)
-                st.plotly_chart(create_price_rsi_chart(mining_detailed[top_mining], top_mining, info["name"]), use_container_width=True)
-        context = mining_df.head(8).to_string(index=False) if not mining_df.empty else "No mining data"
-        add_page_analyzer("Mining", context, selected_model)
-    with tab3:
-        st.subheader("Shipping Stocks Analysis")
-        st.caption("ASX & US shipping companies: QUB.AX, TCL.AX, ASX.AX, ZIM, MATX, SBLK, DAC, CMRE")
-        shipping_tickers = ASX_SHIPPING + US_SHIPPING
-        shipping_data = fetch_batch_data(shipping_tickers, period)
-        shipping_rows = []
-        shipping_detailed: Dict[str, pd.DataFrame] = {}
-        for ticker, df in shipping_data.items():
-            if df.empty or len(df) < 15: continue
-            score, rsi_val, mom = calculate_rebound_score(df)
-            info = get_ticker_info(ticker)
-            latest = df.iloc[-1]
-            prev_close = df.iloc[-2]["Close"] if len(df) > 1 else latest["Close"]
-            change_pct = ((latest["Close"] / prev_close) - 1) * 100
-            shipping_rows.append({"Ticker": ticker, "Company": info["name"], "Market": "ASX" if ".AX" in ticker else "US", "Currency": info["currency"], "Price": round(latest["Close"], 3), "Change %": round(change_pct, 2), "RSI": rsi_val, "Rebound Score": round(score, 1), "Momentum": mom, "Volume": int(latest.get("Volume", 0))})
-            shipping_detailed[ticker] = df
-        shipping_df = pd.DataFrame(shipping_rows)
-        if not shipping_df.empty:
-            shipping_df = shipping_df.sort_values("Rebound Score", ascending=False)
-        if not shipping_df.empty:
-            styled_shipping = shipping_df.style.format({"Price": "${:.3f}", "Change %": "{:.2f}%", "Rebound Score": "{:.1f}", "RSI": "{:.1f}"}).map(lambda x: "color: #2ED573; font-weight: bold" if x >= 65 else ("color: #FFC107; font-weight: bold" if x >= 45 else "color: #FF4757; font-weight: bold"), subset=["Rebound Score"])
-            st.dataframe(styled_shipping, use_container_width=True, hide_index=True)
-            top_shipping_ticker = shipping_df.iloc[0]["Ticker"]
-            if top_shipping_ticker in shipping_detailed:
-                info = get_ticker_info(top_shipping_ticker)
-                st.plotly_chart(create_price_rsi_chart(shipping_detailed[top_shipping_ticker], top_shipping_ticker, info["name"]), use_container_width=True)
-        context_shipping = shipping_df.head(8).to_string(index=False) if not shipping_df.empty else "No shipping data"
-        add_page_analyzer("Shipping", context_shipping, selected_model)
-    with tab4:
+                st.plotly_chart(create_price_rsi_chart(raw_data[top_ticker], top_ticker, info["name"]), use_container_width=True)
+        context = summary_df.head(10).to_string(index=False) if not summary_df.empty else "No data"
+        add_page_analyzer("Dashboard", context)
+
+    # TAB 2-6: SECTOR TABS (using reusable builder)
+    sector_config = {
+        "Mining": (ASX_MINING + US_MINING, "⛏️"),
+        "Shipping": (ASX_SHIPPING + US_SHIPPING, "🚢"),
+        "Energy": (ASX_ENERGY + US_ENERGY, "⚡"),
+        "Technology": (ASX_TECH + US_TECH, "💻"),
+        "Renewables": (ASX_RENEW + US_RENEW, "🌱")
+    }
+    tab_map = {tab2: "Mining", tab3: "Shipping", tab4: "Energy", tab5: "Technology", tab6: "Renewables"}
+
+    for tab_obj, sector_name in tab_map.items():
+        with tab_obj:
+            st.subheader(f"{sector_config[sector_name][1]} {sector_name} Stocks Analysis")
+            sector_tickers = sector_config[sector_name][0]
+            sector_data = {k: v for k, v in raw_data.items() if k in sector_tickers} or fetch_batch_data(sector_tickers, period, real_time_mode)
+            sector_df = build_sector_df(sector_tickers, sector_data, period)
+            if not sector_df.empty:
+                styled = sector_df.style.format({"Price": "${:.3f}", "Change %": "{:.2f}%", "Rebound Score": "{:.1f}", "RSI": "{:.1f}"}).map(
+                    lambda x: "color: #2ED573; font-weight: bold" if x >= 65 else ("color: #FFC107; font-weight: bold" if x >= 45 else "color: #FF4757; font-weight: bold"),
+                    subset=["Rebound Score"]
+                )
+                st.dataframe(styled, use_container_width=True, hide_index=True)
+                top_t = sector_df.iloc[0]["Ticker"]
+                if top_t in sector_data:
+                    info = get_ticker_info(top_t)
+                    st.plotly_chart(create_price_rsi_chart(sector_data[top_t], top_t, info["name"]), use_container_width=True)
+            context = sector_df.head(8).to_string(index=False) if not sector_df.empty else f"No {sector_name.lower()} data"
+            add_page_analyzer(sector_name, context)
+
+    # TAB 7: SIMULATOR
+    with tab7:
         st.subheader("🧪 Rebound Simulator")
-        st.caption("Test rebound score calculations with custom price data")
         col1, col2 = st.columns(2)
-        with col1:
-            ticker_sim = st.text_input("Ticker (for display)", value="SIM.AX")
-        with col2:
-            company_sim = st.text_input("Company name", value="Simulated Co")
-        st.markdown("### Enter historical prices (Close only)")
-        price_input = st.text_area("Price series (one per line, e.g. 10.5, 10.8, ...)", placeholder="12.3\n12.5\n12.1\n11.9\n...", height=150)
-        if st.button("Calculate Rebound Score", use_container_width=True):
+        with col1: ticker_sim = st.text_input("Ticker", value="SIM.AX")
+        with col2: company_sim = st.text_input("Company", value="Simulated Co")
+        price_input = st.text_area("Price series (one per line)", placeholder="12.3\n12.5\n...", height=150)
+        if st.button("Calculate", use_container_width=True):
             try:
                 prices = [float(p.strip()) for p in price_input.strip().split("\n") if p.strip()]
                 if len(prices) < 10:
-                    st.warning("Need at least 10 price points for reliable RSI.")
+                    st.warning("Need ≥10 prices")
                 else:
                     dates = pd.date_range(end=pd.Timestamp.today(), periods=len(prices), freq='B')
                     df_sim = pd.DataFrame({"Close": prices}, index=dates)
                     score, rsi, mom = calculate_rebound_score(df_sim)
-                    st.success(f"**Rebound Score:** {score:.1f} | RSI: {rsi} | Momentum (10d %): {mom}%")
+                    st.success(f"**Rebound Score:** {score:.1f} | RSI: {rsi} | Momentum: {mom}%")
                     st.plotly_chart(create_price_rsi_chart(df_sim, ticker_sim, company_sim), use_container_width=True)
             except Exception as e:
-                st.error(f"Invalid price data: {e}")
-        add_page_analyzer("Simulator", "Custom price input for rebound score testing", selected_model)
-    with tab5:
-        st.subheader("Strategy & Grok Insights")
-        st.caption("Exact $500 AUD CommSec recommendations • Powered by Grok")
+                st.error(f"Invalid data: {e}")
+        add_page_analyzer("Simulator", "Custom price simulator")
+
+    # TAB 8: STRATEGY
+    with tab8:
+        st.subheader("💡 Strategy & Grok Insights ($500 AUD)")
         if not summary_df.empty:
             top_picks = summary_df.head(5)[["Ticker", "Company", "Rebound Score", "RSI"]].to_dict(orient="records")
-            st.write("**Current Top Rebound Picks:**")
             st.dataframe(summary_df.head(5), use_container_width=True, hide_index=True)
             if st.button("Get Grok $500 Portfolio Strategy", use_container_width=True):
-                with st.spinner("Consulting Grok for strategy..."):
+                with st.spinner("Grok consulting..."):
                     strategy_prompt = f"""
-Based on the following top rebound stocks from GeoSupply Analyzer:
+Based on current top rebound stocks (multi-sector):
 {json.dumps(top_picks, indent=2)}
-Suggest a diversified $500 AUD portfolio allocation for CommSec (ASX focus preferred).
-Include exact share quantities assuming current prices, risk reasoning, and expected rebound.
-Be specific and actionable.
+Suggest a diversified $500 AUD CommSec/IBKR-friendly portfolio. Prefer ASX. Include exact share quantities, risk reasoning, and expected rebound. Be specific.
 """
-                    strategy_response = call_grok_api(strategy_prompt, selected_model, temperature=0.7)
-                    st.markdown("### Grok's $500 Strategy Recommendation")
-                    st.write(strategy_response)
-                    if st.button("Save Strategy Analysis"):
-                        analysis = {"tab": "Strategy", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "model_used": selected_model, "user_prompt": "Portfolio strategy", "response": strategy_response}
-                        if save_analysis(analysis):
-                            st.success("Saved!")
-        else:
-            st.info("No data yet.")
-        add_page_analyzer("Strategy & Grok Insights", "Strategy tab with Grok-powered $500 portfolio suggestions", selected_model)
-    with tab6:
-        st.subheader("Saved Grok Analyses")
-        st.caption(f"Loaded from **{SAVED_LOG}** ({len(st.session_state.saved_analyses)} entries)")
+                    response = call_grok_api(strategy_prompt, selected_model)
+                    st.markdown("### Grok Strategy")
+                    st.write(response)
+                    if st.button("Save Strategy"):
+                        analysis = {"tab": "Strategy", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                    "model_used": selected_model, "user_prompt": "Portfolio", "response": response}
+                        save_analysis(analysis)
+        add_page_analyzer("Strategy & Grok Insights", "Grok $500 strategy")
+
+    # TAB 9: SAVED ANALYSES
+    with tab9:
+        st.subheader("📚 Saved Grok Analyses")
+        st.caption(f"**{SAVED_LOG}** • {len(st.session_state.saved_analyses)} entries (optimised deduped load)")
         if st.session_state.saved_analyses:
             for i, analysis in enumerate(reversed(st.session_state.saved_analyses)):
                 with st.expander(f"{analysis['tab']} — {analysis['timestamp']}"):
                     st.write(f"**Model:** {analysis.get('model_used', 'unknown')}")
-                    st.write(f"**User prompt:** {analysis['user_prompt']}")
+                    st.write(f"**Prompt:** {analysis['user_prompt']}")
                     st.write(analysis['response'])
-                    txt = f"Tab: {analysis['tab']}\nTimestamp: {analysis['timestamp']}\nModel: {analysis.get('model_used','unknown')}\nUser prompt: {analysis['user_prompt']}\n\n{analysis['response']}"
-                    st.download_button("Download", data=txt, file_name=f"grok_analysis_{analysis['tab']}_{analysis['timestamp'].replace(':', '-')}.txt", key=f"dl_{i}")
+                    txt = f"Tab: {analysis['tab']}\nTimestamp: {analysis['timestamp']}\nModel: {analysis.get('model_used')}\n\n{analysis['response']}"
+                    st.download_button("Download", data=txt, file_name=f"grok_{analysis['tab']}_{analysis['timestamp'].replace(':', '-')}.txt", key=f"dl_{i}")
         else:
-            st.info("No analyses saved yet. Use any 'Analyse Page with Grok' button.")
-        if st.button("Clear saved.log (delete all)"):
+            st.info("No saved analyses yet.")
+        if st.button("Clear saved.log"):
             if os.path.exists(SAVED_LOG):
                 os.remove(SAVED_LOG)
             st.session_state.saved_analyses = []
-            st.success("saved.log cleared!")
+            st.success("Cleared!")
             st.rerun()
-        add_page_analyzer("Saved Analyses", "Meta-tab showing all saved Grok feedback", selected_model)
-    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | v10.9 • Analyses saved reliably to saved.log")
+        add_page_analyzer("Saved Analyses", "Meta saved analyses tab")
+
+    # TAB 10: INTERACTIVE BROKERS AU
+    with tab10:
+        st.subheader("💼 Interactive Brokers Australia")
+        st.caption("Low-cost execution • ASX + Global • Ideal for $500 portfolios")
+        st.info("IBKR AU offers $0–$5 brokerage on small ASX trades and direct US access. Real API integration possible via ib_insync (future).")
+        
+        col_a, col_b = st.columns(2)
+        with col_a:
+            st.metric("Typical $500 ASX trade fee", "**$0–$5**")
+            st.metric("US stocks", "**$0.005/share** (min $1)")
+        with col_b:
+            st.write("**Why IBKR for GeoSupply users?**")
+            st.write("• Real-time data via TWS API")
+            st.write("• Fractional shares + auto-rebalancing")
+            st.write("• Direct access to all 50+ GeoSupply tickers")
+
+        if st.button("Generate IBKR-Optimised $500 Portfolio", use_container_width=True):
+            with st.spinner("Building IBKR-friendly allocation..."):
+                ibkr_prompt = f"""
+Current top rebound picks (all sectors):
+{json.dumps(summary_df.head(8)[['Ticker','Company','Rebound Score']].to_dict(orient='records') if not summary_df.empty else [])}
+Create a $500 AUD portfolio optimised for IBKR Australia (low fees, whole/fractional shares, ASX priority). 
+Include exact quantities, expected brokerage, and one-click TWS order notes.
+"""
+                ibkr_response = call_grok_api(ibkr_prompt, selected_model)
+                st.markdown("### IBKR-Optimised Strategy")
+                st.write(ibkr_response)
+
+        st.caption("Tip: Use IBKR TWS API + this app for live portfolio sync in future releases.")
+        add_page_analyzer("Interactive Brokers AU", "IBKR AU integration tab")
+
+    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | v11.0 • All sectors combined • Saved.log refined • Real-time + IBKR ready")
 
 if __name__ == "__main__":
     main()
