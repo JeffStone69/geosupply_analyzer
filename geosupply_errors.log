@@ -22,3 +22,23 @@
 2026-04-05 06:03:17,152 - ERROR - 
 1 Failed download:
 2026-04-05 06:03:17,152 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:10:08,766 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=6mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:10:13,262 - ERROR - 
+1 Failed download:
+2026-04-05 06:10:13,262 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=6mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:10:25,750 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:10:31,520 - ERROR - 
+1 Failed download:
+2026-04-05 06:10:31,520 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:11:51,859 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:11:58,700 - ERROR - 
+1 Failed download:
+2026-04-05 06:11:58,700 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:16:12,437 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:16:19,108 - ERROR - 
+1 Failed download:
+2026-04-05 06:16:19,108 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:16:36,062 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=6mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-05 06:16:41,661 - ERROR - 
+1 Failed download:
+2026-04-05 06:16:41,662 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=6mo) (Yahoo error = "No data found, symbol may be delisted")
