@@ -99,3 +99,4 @@
 2026-04-06 16:50:35,350 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
 2026-04-06 16:50:36,215 - ERROR - Data fetch failed: dictionary changed size during iteration
 2026-04-06 16:50:38,537 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:42,326 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
