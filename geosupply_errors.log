@@ -78,3 +78,24 @@
 2026-04-06 16:47:44,457 - ERROR - 
 1 Failed download:
 2026-04-06 16:47:44,457 - ERROR - ['WTC']: possibly delisted; no price data found  (period=1mo)
+2026-04-06 16:48:16,698 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=1mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:48:18,195 - ERROR - 
+1 Failed download:
+2026-04-06 16:48:18,195 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=1mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:10,974 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=6mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:13,754 - ERROR - 
+1 Failed download:
+2026-04-06 16:50:13,754 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=6mo) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:28,127 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:33,859 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:35,349 - ERROR - 
+1 Failed download:
+2026-04-06 16:50:35,349 - ERROR - 
+1 Failed download:
+2026-04-06 16:50:35,350 - ERROR - 
+1 Failed download:
+2026-04-06 16:50:35,350 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:35,350 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:35,350 - ERROR - ['RNE.AX']: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+2026-04-06 16:50:36,215 - ERROR - Data fetch failed: dictionary changed size during iteration
+2026-04-06 16:50:38,537 - ERROR - $RNE.AX: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
